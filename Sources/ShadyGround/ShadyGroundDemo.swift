@@ -1,0 +1,113 @@
+//
+//  ShadyGroundDemo.swift
+//  ShadyGround
+//
+//  Created by Michael Bedar on 9/20/25.
+//
+
+import SwiftUI
+
+/// A comprehensive demo showcasing all available shader effects
+@MainActor
+public struct ShadyGroundDemo: View {
+    @State private var selectedEffect: String = "Checkerboard"
+    @State private var selectedCategory: String = "All"
+    
+    private         let effects: [String: any PreviewableShaderEffect.Type] = [
+            "Checkerboard": CheckerboardBackground.self,
+            "Stripe": StripeBackground.self,
+            "Dots": DotsBackground.self,
+            "Wave": WaveBackground.self,
+            "Grid": GridBackground.self,
+            "Noise": NoiseBackground.self,
+//            "Concentric Circles": CirclesBackground.self,
+//            "Concentric Squares": SquaresBackground.self,
+//            "Spiral": SpiralBackground.self,
+            "Brick": BrickBackground.self
+        ]
+    
+    public init() {}
+    
+    public var body: some View {
+        NavigationSplitView {
+            // Sidebar with effect list
+            List {
+                Section("Categories") {
+                    ForEach(ShaderEffectRegistry.categories, id: \.self) { category in
+                        Button(category) {
+                            selectedCategory = category
+                        }
+                        .foregroundColor(selectedCategory == category ? .accentColor : .primary)
+                    }
+                }
+                
+                Section("Effects") {
+                    ForEach(ShaderEffectRegistry.allEffects, id: \.name) { effect in
+                        if selectedCategory == "All" || effect.category == selectedCategory {
+                            Button(effect.name) {
+                                selectedEffect = effect.name
+                            }
+                            .foregroundColor(selectedEffect == effect.name ? .accentColor : .primary)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("ShadyGround")
+        } detail: {
+            // Main preview area
+            if let effectType = effects[selectedEffect] {
+                ShaderEffectPreviewContainer(effectType: effectType)
+            } else {
+                ContentUnavailableView(
+                    "Select an Effect",
+                    systemImage: "slider.horizontal.3",
+                    description: Text("Choose a shader effect from the sidebar to see its preview and controls")
+                )
+            }
+        }
+        .navigationSplitViewStyle(.balanced)
+    }
+}
+
+/// A container that dynamically creates previews for any shader effect
+@MainActor
+private struct ShaderEffectPreviewContainer: View {
+    let effectType: any PreviewableShaderEffect.Type
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Effect title and description
+            VStack(alignment: .leading, spacing: 8) {
+                Text(effectType.effectName)
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                
+                Text(effectType.effectDescription)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                
+                Text("Category: \(effectType.effectCategory)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(.quaternary, in: Capsule())
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
+            .background(.regularMaterial)
+            
+            // Dynamic preview - use AnyView to handle the protocol type
+            AnyView(effectType.previewView())
+                .frame(maxWidth: CGFloat.infinity, maxHeight: CGFloat.infinity)
+        }
+        .navigationTitle("")
+    }
+}
+
+// MARK: - SwiftUI Preview
+
+#Preview("ShadyGround Gallery") {
+    ShadyGroundDemo()
+        .frame(width: 1000, height: 800, alignment: .topLeading)
+}
