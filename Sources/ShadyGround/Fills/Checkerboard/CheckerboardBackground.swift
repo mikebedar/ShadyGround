@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct CheckerboardBackground: View, PreviewableShaderEffect {
+public struct CheckerboardBackground: View {
     public let cellSize: CGFloat
     public let angle: Double
     public let backgroundColor: Color
@@ -21,7 +21,7 @@ public struct CheckerboardBackground: View, PreviewableShaderEffect {
     }
 
     private var shader: Shader {
-        SPMShaderLibrary.default.checkerboard(
+        ShadyGroundLibrary.default.checkerboard(
             .float(cellSize),
             .float(angle),
             .color(backgroundColor),
@@ -36,80 +36,5 @@ public struct CheckerboardBackground: View, PreviewableShaderEffect {
     }
 }
 
-// MARK: - Preview Implementation
-extension CheckerboardBackground {
-    public static func previewView() -> some View {
-        CheckerboardPreview()
-    }
-}
 
-@MainActor
-private struct CheckerboardPreview: View {
-    @State private var cellSize: CGFloat = 12
-    @State private var angle: Double = 0
-    @State private var backgroundColor: Color = .gray.opacity(0.0)
-    @State private var foregroundColor: Color = .gray.opacity(0.2)
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            // Main preview
-            CheckerboardBackground(
-                cellSize: cellSize,
-                angle: angle,
-                backgroundColor: backgroundColor,
-                foregroundColor: foregroundColor
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .clipped()
-            
-            // Parameter controls
-            VStack(spacing: 16) {
-                // Randomize button
-                Button(action: randomizeColors) {
-                    HStack {
-                        Image(systemName: "shuffle")
-                        Text("Randomize Colors")
-                    }
-                    .font(.caption)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(.blue, in: Capsule())
-                }
-                
-                ParameterControlGrid {
-                    NumericParameterControl(
-                        title: "Cell Size",
-                        value: $cellSize,
-                        in: 4...50,
-                        step: 2
-                    )
-                    
-                    AngleParameterControl(
-                        title: "Angle",
-                        value: $angle
-                    )
-                    
-                    ColorParameterControl(
-                        title: "Background Color",
-                        value: $backgroundColor
-                    )
-                    
-                    ColorParameterControl(
-                        title: "Foreground Color",
-                        value: $foregroundColor
-                    )
-                }
-            }
-        }
-        .onAppear {
-            randomizeColors()
-        }
-    }
-    
-    private func randomizeColors() {
-        let (baseColor, complementaryColor) = ColorUtils.randomColorPair()
-        backgroundColor = baseColor
-        foregroundColor = complementaryColor
-    }
-}
+// MARK: - Preview Implementation

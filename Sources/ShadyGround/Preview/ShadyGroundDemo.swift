@@ -13,16 +13,13 @@ public struct ShadyGroundDemo: View {
     @State private var selectedEffect: String = "Checkerboard"
     @State private var selectedCategory: String = "All"
     
-    private         let effects: [String: any PreviewableShaderEffect.Type] = [
+    private let effects: [String: any ShaderEffect.Type] = [
             "Checkerboard": CheckerboardBackground.self,
             "Stripe": StripeBackground.self,
             "Dots": DotsBackground.self,
             "Wave": WaveBackground.self,
             "Grid": GridBackground.self,
             "Noise": NoiseBackground.self,
-//            "Concentric Circles": CirclesBackground.self,
-//            "Concentric Squares": SquaresBackground.self,
-//            "Spiral": SpiralBackground.self,
             "Brick": BrickBackground.self
         ]
     
@@ -72,7 +69,7 @@ public struct ShadyGroundDemo: View {
 /// A container that dynamically creates previews for any shader effect
 @MainActor
 private struct ShaderEffectPreviewContainer: View {
-    let effectType: any PreviewableShaderEffect.Type
+    let effectType: any ShaderEffect.Type
     
     var body: some View {
         VStack(spacing: 0) {
@@ -97,11 +94,34 @@ private struct ShaderEffectPreviewContainer: View {
             .padding()
             .background(.regularMaterial)
             
-            // Dynamic preview - use AnyView to handle the protocol type
-            AnyView(effectType.previewView())
+            // Create the appropriate preview based on effect type
+            previewForEffect(effectType)
                 .frame(maxWidth: CGFloat.infinity, maxHeight: CGFloat.infinity)
         }
         .navigationTitle("")
+    }
+    
+    @ViewBuilder
+    private func previewForEffect(_ effectType: any ShaderEffect.Type) -> some View {
+        switch effectType {
+        case is CheckerboardBackground.Type:
+            CheckerboardPreview()
+        case is StripeBackground.Type:
+            StripePreview()
+        case is DotsBackground.Type:
+            DotsPreview()
+        case is WaveBackground.Type:
+            WavePreview()
+        case is GridBackground.Type:
+            GridPreview()
+        case is NoiseBackground.Type:
+            NoisePreview()
+        case is BrickBackground.Type:
+            BrickPreview()
+        default:
+            Text("Preview not available")
+                .foregroundColor(.secondary)
+        }
     }
 }
 

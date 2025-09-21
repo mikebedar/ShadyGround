@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// A brick pattern with customizable brick dimensions, mortar width, and rotation
-public struct BrickBackground: View, PreviewableShaderEffect {
+public struct BrickBackground: View {
     public let brickWidth: CGFloat
     public let brickHeight: CGFloat
     public let mortarWidth: CGFloat
@@ -26,7 +26,7 @@ public struct BrickBackground: View, PreviewableShaderEffect {
     }
 
     private var shader: Shader {
-        SPMShaderLibrary.default.brick(
+        ShadyGroundLibrary.default.brick(
             .float(brickWidth),
             .float(brickHeight),
             .float(mortarWidth),
@@ -43,97 +43,4 @@ public struct BrickBackground: View, PreviewableShaderEffect {
     }
 }
 
-extension BrickBackground {
-    public static func previewView() -> some View {
-        BrickPreview()
-    }
-}
 
-@MainActor
-private struct BrickPreview: View {
-    @State private var brickWidth: CGFloat = 80
-    @State private var brickHeight: CGFloat = 40
-    @State private var mortarWidth: CGFloat = 4
-    @State private var angle: Double = 0
-    @State private var backgroundColor: Color = .gray.opacity(0.0)
-    @State private var foregroundColor: Color = .gray.opacity(0.2)
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            // Main preview
-            BrickBackground(
-                brickWidth: brickWidth,
-                brickHeight: brickHeight,
-                mortarWidth: mortarWidth,
-                angle: angle,
-                backgroundColor: backgroundColor,
-                foregroundColor: foregroundColor
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .clipped()
-            
-            // Parameter controls
-            VStack(spacing: 16) {
-                // Randomize button
-                Button(action: randomizeColors) {
-                    HStack {
-                        Image(systemName: "shuffle")
-                        Text("Randomize Colors")
-                    }
-                    .font(.caption)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(.blue, in: Capsule())
-                }
-                
-                ParameterControlGrid {
-                    NumericParameterControl(
-                        title: "Brick Width (px)",
-                        value: $brickWidth,
-                        in: 20...200,
-                        step: 5
-                    )
-                    
-                    NumericParameterControl(
-                        title: "Brick Height (px)",
-                        value: $brickHeight,
-                        in: 10...100,
-                        step: 5
-                    )
-                    
-                    NumericParameterControl(
-                        title: "Mortar Width (px)",
-                        value: $mortarWidth,
-                        in: 1...20,
-                        step: 1
-                    )
-                    
-                    AngleParameterControl(
-                        title: "Angle",
-                        value: $angle
-                    )
-                    
-                    ColorParameterControl(
-                        title: "Background Color",
-                        value: $backgroundColor
-                    )
-                    
-                    ColorParameterControl(
-                        title: "Foreground Color",
-                        value: $foregroundColor
-                    )
-                }
-            }
-        }
-        .onAppear {
-            randomizeColors()
-        }
-    }
-    
-    private func randomizeColors() {
-        let (baseColor, complementaryColor) = ColorUtils.randomColorPair()
-        backgroundColor = baseColor
-        foregroundColor = complementaryColor
-    }
-}

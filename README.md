@@ -114,7 +114,7 @@ The preview system provides:
 To create your own shader effects, conform to the `ShaderEffect` protocol:
 
 ```swift
-public struct MyCustomEffect: View, PreviewableShaderEffect {
+public struct MyCustomEffect: View {
     public let parameter1: CGFloat
     public let parameter2: Color
     

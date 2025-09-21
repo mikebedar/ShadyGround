@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct GridBackground: View, PreviewableShaderEffect {
+public struct GridBackground: View {
     public let spacing: CGFloat
     public let lineWidth: CGFloat
     public let angle: Double
@@ -23,7 +23,7 @@ public struct GridBackground: View, PreviewableShaderEffect {
     }
 
     private var shader: Shader {
-        SPMShaderLibrary.default.grid(
+        ShadyGroundLibrary.default.grid(
             .float(spacing),
             .float(lineWidth),
             .float(angle),
@@ -39,89 +39,4 @@ public struct GridBackground: View, PreviewableShaderEffect {
     }
 }
 
-// MARK: - Preview Implementation
-extension GridBackground {
-    public static func previewView() -> some View {
-        GridPreview()
-    }
-}
 
-@MainActor
-private struct GridPreview: View {
-    @State private var spacing: CGFloat = 20
-    @State private var lineWidth: CGFloat = 1
-    @State private var angle: Double = 0
-    @State private var backgroundColor: Color = .gray.opacity(0.0)
-    @State private var foregroundColor: Color = .gray.opacity(0.2)
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            // Main preview
-            GridBackground(
-                spacing: spacing,
-                lineWidth: lineWidth,
-                angle: angle,
-                backgroundColor: backgroundColor,
-                foregroundColor: foregroundColor
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .clipped()
-            
-            // Parameter controls
-            VStack(spacing: 16) {
-                // Randomize button
-                Button(action: randomizeColors) {
-                    HStack {
-                        Image(systemName: "shuffle")
-                        Text("Randomize Colors")
-                    }
-                    .font(.caption)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(.blue, in: Capsule())
-                }
-                
-                ParameterControlGrid {
-                    NumericParameterControl(
-                        title: "Spacing",
-                        value: $spacing,
-                        in: 10...100,
-                        step: 5
-                    )
-                    
-                    NumericParameterControl(
-                        title: "Line Width",
-                        value: $lineWidth,
-                        in: 0.5...10,
-                        step: 0.5
-                    )
-                    
-                    AngleParameterControl(
-                        title: "Angle",
-                        value: $angle
-                    )
-                    
-                    ColorParameterControl(
-                        title: "Background Color",
-                        value: $backgroundColor
-                    )
-                    
-                    ColorParameterControl(
-                        title: "Foreground Color",
-                        value: $foregroundColor
-                    )
-                }
-            }
-        }
-        .onAppear {
-            randomizeColors()
-        }
-    }
-    
-    private func randomizeColors() {
-        let (baseColor, complementaryColor) = ColorUtils.randomColorPair()
-        backgroundColor = baseColor
-        foregroundColor = complementaryColor
-    }
-}
