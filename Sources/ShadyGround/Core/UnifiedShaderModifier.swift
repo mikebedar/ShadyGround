@@ -27,16 +27,123 @@ public enum ShaderTimeSource: Equatable {
 }
 
 public extension View {
-    /// Applies a Metal shader created from a closure that can *optionally* consume the view's size and time.
+    // MARK: - Static Shader (no size, no time)
+    
+    /// Applies a static Metal shader that doesn't need size or time information.
     ///
-    /// Set `needsSize` to `true` if your shader relies on the view’s current size (e.g., “N cells across”).
+    /// Use this for shaders that only depend on `position` (pixel space) and
+    /// their own uniforms—i.e., they **do not** need the view's size or time.
+    ///
+    /// - Parameters:
+    ///   - shader: The `Shader` instance to apply.
+    ///   - maxSampleOffset: Maximum neighbor sampling distance your shader might use.
+    ///   - isEnabled: Pass `false` to disable the effect without removing it.
+    /// - Returns: A view with the shader applied.
+    @inlinable
+    func shadyLayerEffect(
+        _ shader: Shader,
+        maxSampleOffset: CGSize = .zero,
+        isEnabled: Bool = true
+    ) -> some View {
+        shadyLayerEffect(
+            needsSize: false,
+            timeSource: .none,
+            maxSampleOffset: maxSampleOffset,
+            isEnabled: isEnabled
+        ) { _ in shader }
+    }
+    
+    /// Applies a static Metal shader created from a closure.
+    ///
+    /// Use this for shaders that only depend on `position` (pixel space) and
+    /// their own uniforms—i.e., they **do not** need the view's size or time.
+    ///
+    /// - Parameters:
+    ///   - makeShader: Closure that builds and returns the `Shader`.
+    ///   - maxSampleOffset: Maximum neighbor sampling distance your shader might use.
+    ///   - isEnabled: Pass `false` to disable the effect without removing it.
+    /// - Returns: A view with the shader applied.
+    @inlinable
+    func shadyLayerEffect(
+        _ makeShader: @escaping () -> Shader,
+        maxSampleOffset: CGSize = .zero,
+        isEnabled: Bool = true
+    ) -> some View {
+        shadyLayerEffect(
+            needsSize: false,
+            timeSource: .none,
+            maxSampleOffset: maxSampleOffset,
+            isEnabled: isEnabled
+        ) { _ in makeShader() }
+    }
+    
+    // MARK: - Size-Aware Shader (no time)
+    
+    /// Applies a shader that adapts to the view's current size.
+    ///
+    /// Use this when your Metal shader needs the view's size (e.g., "N cells across,"
+    /// centered gradients, radial effects). The modifier measures the view using
+    /// `onGeometryChange` and reconfigures the shader whenever the size changes.
+    ///
+    /// - Parameters:
+    ///   - makeShader: A closure that receives the current `CGSize` of the view
+    ///     and returns a configured `Shader` for that size.
+    ///   - maxSampleOffset: Maximum neighbor sampling distance your shader might use.
+    ///   - isEnabled: Pass `false` to disable the effect without removing it.
+    /// - Returns: A view with a size-aware shader applied.
+    @inlinable
+    func shadyLayerEffect(
+        _ makeShader: @escaping (_ size: CGSize) -> Shader,
+        maxSampleOffset: CGSize = .zero,
+        isEnabled: Bool = true
+    ) -> some View {
+        shadyLayerEffect(
+            needsSize: true,
+            timeSource: .none,
+            maxSampleOffset: maxSampleOffset,
+            isEnabled: isEnabled
+        ) { context in makeShader(context.size) }
+    }
+    
+    // MARK: - Time-Based Shader (no size)
+    
+    /// Applies a shader that animates over time.
+    ///
+    /// Use this for shaders that need time information but not size.
+    ///
+    /// - Parameters:
+    ///   - timeSource: Choose `.animation` for per-frame updates or `.periodic(by:)` for a fixed tick rate.
+    ///   - makeShader: Closure that builds a `Shader` from the current time.
+    ///   - maxSampleOffset: Maximum neighbor sampling distance your shader might use.
+    ///   - isEnabled: Pass `false` to disable the effect without removing it.
+    /// - Returns: A view with the animated shader applied.
+    @inlinable
+    func shadyLayerEffect(
+        timeSource: ShaderTimeSource,
+        _ makeShader: @escaping (_ time: Double) -> Shader,
+        maxSampleOffset: CGSize = .zero,
+        isEnabled: Bool = true
+    ) -> some View {
+        shadyLayerEffect(
+            needsSize: false,
+            timeSource: timeSource,
+            maxSampleOffset: maxSampleOffset,
+            isEnabled: isEnabled
+        ) { context in makeShader(context.time) }
+    }
+    
+    // MARK: - Full Context Shader (size + time)
+    
+    /// Applies a Metal shader created from a closure that can consume the view's size and time.
+    ///
+    /// Set `needsSize` to `true` if your shader relies on the view's current size (e.g., "N cells across").
     /// Choose a `timeSource` if your shader animates over time. If both are unused, this acts like a simple, static layerEffect.
     ///
     /// The `makeShader` closure receives a `ShaderContext` containing the current `size` and `time` values
     /// (populated based on `needsSize` and `timeSource`), and returns the configured `Shader`.
     ///
     /// - Parameters:
-    ///   - needsSize: When `true`, the modifier tracks the view’s size and passes it in `context.size`.
+    ///   - needsSize: When `true`, the modifier tracks the view's size and passes it in `context.size`.
     ///   - timeSource: Choose `.animation` for per-frame updates or `.periodic(by:)` for a fixed tick rate.
     ///   - maxSampleOffset: Declare the largest neighbor offset your shader may sample (for `layer.sample`).
     ///   - isEnabled: Toggle the effect on/off without removing it.
