@@ -93,20 +93,6 @@ extension NoiseBackground: ShaderEffect {
     }
 }
 
-extension BrickBackground: ShaderEffect {
-    public static var effectName: String { "Brick" }
-    public static var effectDescription: String { "Brick wall pattern with customizable dimensions and mortar width" }
-    public static var effectCategory: String { "Patterns" }
-
-    public static var effectConfig: ShaderEffectConfig {
-        ShaderEffectConfig(
-            name: effectName,
-            description: effectDescription,
-            category: effectCategory
-        )
-    }
-}
-
 extension SpiralBackground {
     public static var effectConfig: ShaderEffectConfig {
         ShaderEffectConfig(

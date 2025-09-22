@@ -10,101 +10,6 @@ import SwiftUI
 // Import all preview files to make them available
 // This file ensures all preview classes are accessible to the demo
 
-// Brick Preview
-extension BrickBackground {
-    public static func previewView() -> some View {
-        BrickPreview()
-    }
-}
-
-@MainActor
-public struct BrickPreview: View {
-    @State private var brickWidth: CGFloat = 80
-    @State private var brickHeight: CGFloat = 40
-    @State private var mortarWidth: CGFloat = 4
-    @State private var angle: Double = 0
-    @State private var backgroundColor: Color = .gray.opacity(0.0)
-    @State private var foregroundColor: Color = .gray.opacity(0.2)
-    
-    public var body: some View {
-        VStack(spacing: 0) {
-            // Main preview
-            BrickBackground(
-                brickWidth: brickWidth,
-                brickHeight: brickHeight,
-                mortarWidth: mortarWidth,
-                angle: angle,
-                backgroundColor: backgroundColor,
-                foregroundColor: foregroundColor
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .clipped()
-            
-            // Parameter controls
-            VStack(spacing: 16) {
-                // Randomize button
-                Button(action: randomizeColors) {
-                    HStack {
-                        Image(systemName: "shuffle")
-                        Text("Randomize Colors")
-                    }
-                    .font(.caption)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(.blue, in: Capsule())
-                }
-                
-                ParameterControlGrid {
-                    NumericParameterControl(
-                        title: "Brick Width (px)",
-                        value: $brickWidth,
-                        in: 20...200,
-                        step: 5
-                    )
-                    
-                    NumericParameterControl(
-                        title: "Brick Height (px)",
-                        value: $brickHeight,
-                        in: 10...100,
-                        step: 5
-                    )
-                    
-                    NumericParameterControl(
-                        title: "Mortar Width (px)",
-                        value: $mortarWidth,
-                        in: 1...20,
-                        step: 1
-                    )
-                    
-                    AngleParameterControl(
-                        title: "Angle",
-                        value: $angle
-                    )
-                    
-                    ColorParameterControl(
-                        title: "Background Color",
-                        value: $backgroundColor
-                    )
-                    
-                    ColorParameterControl(
-                        title: "Foreground Color",
-                        value: $foregroundColor
-                    )
-                }
-            }
-        }
-        .onAppear {
-            randomizeColors()
-        }
-    }
-    
-    private func randomizeColors() {
-        let (baseColor, complementaryColor) = ColorUtils.randomColorPair()
-        backgroundColor = baseColor
-        foregroundColor = complementaryColor
-    }
-}
 
 // Checkerboard Preview
 extension CheckerboardBackground {
@@ -149,9 +54,9 @@ public struct CheckerboardPreview: View {
                 
                 ParameterControlGrid {
                     NumericParameterControl(
-                        title: "Cell Size",
+                        title: "Cell Size (px)",
                         value: $cellSize,
-                        in: 4...50,
+                        in: 4...100,
                         step: 2
                     )
                     
@@ -234,16 +139,16 @@ public struct DotsPreview: View {
                 
                 ParameterControlGrid {
                     NumericParameterControl(
-                        title: "Dot Size",
+                        title: "Dot Size (px)",
                         value: $dotSize,
-                        in: 2...30,
+                        in: 2...50,
                         step: 1
                     )
                     
                     NumericParameterControl(
-                        title: "Spacing",
+                        title: "Spacing (px)",
                         value: $spacing,
-                        in: minSpacing...100,
+                        in: minSpacing...150,
                         step: 2
                     )
                     
@@ -321,16 +226,16 @@ public struct GridPreview: View {
                 
                 ParameterControlGrid {
                     NumericParameterControl(
-                        title: "Spacing",
+                        title: "Spacing (px)",
                         value: $spacing,
-                        in: 10...100,
+                        in: 10...200,
                         step: 5
                     )
                     
                     NumericParameterControl(
-                        title: "Line Width",
+                        title: "Line Width (px)",
                         value: $lineWidth,
-                        in: 0.5...10,
+                        in: 0.5...20,
                         step: 0.5
                     )
                     
@@ -414,35 +319,35 @@ public struct NoisePreview: View {
                 
                 ParameterControlGrid {
                     NumericParameterControl(
-                        title: "Scale",
+                        title: "Scale (factor)",
                         value: $scale,
-                        in: 0.01...1.0,
+                        in: 0.01...2.0,
                         step: 0.01
                     )
                     
                     NumericParameterControl(
-                        title: "Intensity",
+                        title: "Intensity (%)",
                         value: $intensity,
                         in: 0.0...1.0,
                         step: 0.01
                     )
                     
                     NumericParameterControl(
-                        title: "Octaves",
+                        title: "Octaves (layers)",
                         value: $octaves,
                         in: 1...8,
                         step: 1
                     )
                     
                     NumericParameterControl(
-                        title: "Persistence",
+                        title: "Persistence (factor)",
                         value: $persistence,
                         in: 0.1...1.0,
                         step: 0.1
                     )
                     
                     NumericParameterControl(
-                        title: "Seed",
+                        title: "Seed (random)",
                         value: $seed,
                         in: 0...1000,
                         step: 1
@@ -519,9 +424,9 @@ public struct StripePreview: View {
                 
                 ParameterControlGrid {
                     NumericParameterControl(
-                        title: "Stripe Width",
+                        title: "Stripe Width (px)",
                         value: $stripeWidth,
-                        in: 5...100,
+                        in: 5...200,
                         step: 5
                     )
                     
@@ -566,7 +471,6 @@ public struct WavePreview: View {
     @State private var amplitude: CGFloat = 20
     @State private var frequency: CGFloat = 0.1
     @State private var foregroundStripeWidth: CGFloat = 25
-    @State private var backgroundStripeWidth: CGFloat = 25
     @State private var phase: Double = 0
     @State private var angle: Double = 0
     @State private var colorCount: CGFloat = 2
@@ -579,7 +483,7 @@ public struct WavePreview: View {
                 amplitude: amplitude,
                 frequency: frequency,
                 foregroundStripeWidth: foregroundStripeWidth,
-                backgroundStripeWidth: backgroundStripeWidth,
+                backgroundStripeWidth: foregroundStripeWidth, // Use same width for both
                 phase: phase,
                 angle: angle,
                 colors: colors
@@ -604,35 +508,28 @@ public struct WavePreview: View {
                 
                 ParameterControlGrid {
                     NumericParameterControl(
-                        title: "Amplitude",
+                        title: "Amplitude (px)",
                         value: $amplitude,
-                        in: 5...100,
+                        in: 5...200,
                         step: 5
                     )
                     
                     NumericParameterControl(
-                        title: "Frequency",
+                        title: "Frequency (cycles/px)",
                         value: $frequency,
-                        in: 0.01...0.5,
+                        in: 0.01...1.0,
                         step: 0.01
                     )
                     
                     NumericParameterControl(
-                        title: "Foreground Stripe Width",
+                        title: "Stripe Width (px)",
                         value: $foregroundStripeWidth,
-                        in: 5...100,
-                        step: 5
-                    )
-                    
-                    NumericParameterControl(
-                        title: "Background Stripe Width",
-                        value: $backgroundStripeWidth,
-                        in: 5...100,
+                        in: 5...200,
                         step: 5
                     )
                     
                     AngleParameterControl(
-                        title: "Phase",
+                        title: "Phase (degrees)",
                         value: $phase
                     )
                     
@@ -710,41 +607,41 @@ public struct SpiralPreview: View {
                 
                 ParameterControlGrid {
                     NumericParameterControl(
-                        title: "Stripes Per Turn",
+                        title: "Stripes Per Turn (count)",
                         value: $stripesPerTurn,
-                        in: 1...20,
+                        in: 1...50,
                         step: 1
                     )
                     
                     NumericParameterControl(
-                        title: "Twist",
+                        title: "Twist (strength)",
                         value: $twist,
-                        in: 0...4,
+                        in: 0...10,
                         step: 0.1
                     )
                     
                     NumericParameterControl(
-                        title: "Center Offset X",
+                        title: "Center Offset X (px)",
                         value: Binding(
                             get: { centerOffsetPx.width },
                             set: { centerOffsetPx.width = $0 }
                         ),
-                        in: -100...100,
+                        in: -200...200,
                         step: 5
                     )
                     
                     NumericParameterControl(
-                        title: "Center Offset Y",
+                        title: "Center Offset Y (px)",
                         value: Binding(
                             get: { centerOffsetPx.height },
                             set: { centerOffsetPx.height = $0 }
                         ),
-                        in: -100...100,
+                        in: -200...200,
                         step: 5
                     )
                     
                     NumericParameterControl(
-                        title: "Color Count",
+                        title: "Color Count (colors)",
                         value: $colorCount,
                         in: 1...8,
                         step: 1

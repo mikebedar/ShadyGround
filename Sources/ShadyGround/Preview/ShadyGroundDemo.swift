@@ -10,7 +10,7 @@ import SwiftUI
 /// A comprehensive demo showcasing all available shader effects
 @MainActor
 public struct ShadyGroundDemo: View {
-    @State private var selectedEffect: String = "Wave"
+    @State private var selectedEffect: String = "Checkerboard"
     @State private var selectedCategory: String = "All"
     
     private let effects: [String: any ShaderEffect.Type] = [
@@ -21,7 +21,6 @@ public struct ShadyGroundDemo: View {
             "Wave": WaveBackground.self,
             "Grid": GridBackground.self,
             "Noise": NoiseBackground.self,
-            "Brick": BrickBackground.self
         ]
     
     public init() {}
@@ -117,8 +116,6 @@ private struct ShaderEffectPreviewContainer: View {
             GridPreview()
         case is NoiseBackground.Type:
             NoisePreview()
-        case is BrickBackground.Type:
-            BrickPreview()
         case is SpiralBackground.Type:
             SpiralPreview()
         default:
@@ -132,5 +129,5 @@ private struct ShaderEffectPreviewContainer: View {
 
 #Preview("ShadyGround Gallery") {
     ShadyGroundDemo()
-        .frame(width: 1000, height: 800, alignment: .topLeading)
+        .frame(width: 600, height: 700, alignment: .topLeading)
 }

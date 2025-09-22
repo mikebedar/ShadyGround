@@ -132,8 +132,8 @@ public struct CustomAnimatedSpiral: View {
                         stripesPerTurn: 1.0,
                         baseTwist: 1.0,
                         twistAmplitude: 2.0,
-                        animationSpeed: 1.0,
-                        colors: [.red, .orange, .yellow, .green]
+                        animationSpeed: 0.5,
+                        colors: [.red, .orange, .cyan, .purple]
                     )
                     
                 case .fast:
@@ -179,11 +179,11 @@ public struct CustomAnimatedSpiral: View {
 #if DEBUG
 #Preview("Spiral Animation Demo") {
     SpiralAnimationDemo()
-        .frame(height: 1000)
+        .frame(height: 800)
 }
 
 #Preview("Custom Animated Spiral") {
     CustomAnimatedSpiral()
-        .frame(height: 800)
+        .frame(height: 600)
 }
 #endif

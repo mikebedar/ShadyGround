@@ -28,7 +28,6 @@ let package = Package(
             .process("Fills/Wave/WaveShader.metal"),
             .process("Fills/Grid/GridShader.metal"),
             .process("Fills/Noise/NoiseShader.metal"),
-            .process("Fills/Brick/BrickShader.metal")
         ]
         ),
         .testTarget(
