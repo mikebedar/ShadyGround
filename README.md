@@ -94,7 +94,6 @@ WaveBackground(
     amplitude: 20,          // Height of wave peaks
     frequency: 0.1,         // How many waves across the pattern
     foregroundStripeWidth: 25,
-    backgroundStripeWidth: 25,
     phase: 0,               // Wave offset
     angle: 0,               // Rotation angle in radians
     colors: [.blue, .cyan, .purple, .pink]  // 2-8 colors
@@ -170,8 +169,8 @@ Example of an animated use case with `AnimatedSpiralBackground`:
 AnimatedSpiralBackground(
     stripesPerTurn: 8,
     baseTwist: 1.0,
-    twistAmplitude: 2.0,
-    animationSpeed: 1.0,
+    twistAmplitude: 2000.0,
+    animationSpeed: 0.25,
     colors: [.red, .orange, .yellow, .green, .blue, .purple]
 )
 ```
