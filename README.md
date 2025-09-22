@@ -1,5 +1,7 @@
 # ShadyGround
 
+<img src="Images/swirl.gif" width="320" height="296" alt="ShadyGround Spiral Animation">
+
 A Swift Package for Beautiful Metal Shader patterns in SwiftUI
 
 ShadyGround provides a collection of high-performance Metal patterns for SwiftUI, with a consistent API and built-in preview capabilities. Perfect for creating stunning backgrounds and visual effects in your iOS and macOS apps.
@@ -44,6 +46,7 @@ struct ContentView: View {
             WaveBackground(
                 amplitude: 20,
                 frequency: 0.1,
+                stripeWidth: 25,
                 colors: [.cyan, .blue, .purple, .pink]
             )
             .frame(width: 200, height: 200)
@@ -93,7 +96,7 @@ Smooth wave-like stripes with amplitude and frequency control. Supports 2-8 colo
 WaveBackground(
     amplitude: 20,          // Height of wave peaks
     frequency: 0.1,         // How many waves across the pattern
-    foregroundStripeWidth: 25,
+    stripeWidth: 25,        // Width of wave stripes
     phase: 0,               // Wave offset
     angle: 0,               // Rotation angle in radians
     colors: [.blue, .cyan, .purple, .pink]  // 2-8 colors

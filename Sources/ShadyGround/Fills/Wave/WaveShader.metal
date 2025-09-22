@@ -21,7 +21,7 @@ inline half4 paletteAt(int i, int n,
 }
 
 [[ stitchable ]] half4 wave(float2 position, SwiftUI::Layer layer, 
-                           float amplitude, float frequency, float foregroundStripeWidth, 
+                           float amplitude, float frequency, float stripeWidth, 
                            float backgroundStripeWidth, float phase, float angleRadians, 
                            float paletteCount,
                            half4 c0, half4 c1, half4 c2, half4 c3,
@@ -40,14 +40,14 @@ inline half4 paletteAt(int i, int n,
     // Use palette to select color based on stripe index
     int n = clamp(int(paletteCount), 1, 8);
     
-    // Calculate total stripe cycle width (use foregroundStripeWidth as the base stripe width)
-    float stripeWidth = foregroundStripeWidth;
+    // Calculate total stripe cycle width (use stripeWidth as the base stripe width)
+    float totalStripeWidth = stripeWidth;
     
     // Create stripes based on the distorted Y coordinate
-    float stripePosition = fmod(fmod(distortedY, stripeWidth * float(n)) + stripeWidth * float(n), stripeWidth * float(n));
+    float stripePosition = fmod(fmod(distortedY, totalStripeWidth * float(n)) + totalStripeWidth * float(n), totalStripeWidth * float(n));
     
     // Calculate which stripe we're in based on position
-    int stripeIndex = int(floor(stripePosition / stripeWidth));
+    int stripeIndex = int(floor(stripePosition / totalStripeWidth));
     
     // Calculate color index
     int colorIndex = abs(stripeIndex) % n;

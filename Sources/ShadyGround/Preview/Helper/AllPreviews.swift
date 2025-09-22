@@ -470,7 +470,7 @@ extension WaveBackground {
 public struct WavePreview: View {
     @State private var amplitude: CGFloat = 20
     @State private var frequency: CGFloat = 0.1
-    @State private var foregroundStripeWidth: CGFloat = 25
+    @State private var stripeWidth: CGFloat = 25
     @State private var phase: Double = 0
     @State private var angle: Double = 0
     @State private var colorCount: CGFloat = 2
@@ -482,8 +482,8 @@ public struct WavePreview: View {
             WaveBackground(
                 amplitude: amplitude,
                 frequency: frequency,
-                foregroundStripeWidth: foregroundStripeWidth,
-                backgroundStripeWidth: foregroundStripeWidth, // Use same width for both
+                stripeWidth: stripeWidth,
+                backgroundStripeWidth: stripeWidth, // Use same width for both
                 phase: phase,
                 angle: angle,
                 colors: colors
@@ -523,7 +523,7 @@ public struct WavePreview: View {
                     
                     NumericParameterControl(
                         title: "Stripe Width (px)",
-                        value: $foregroundStripeWidth,
+                        value: $stripeWidth,
                         in: 5...200,
                         step: 5
                     )
