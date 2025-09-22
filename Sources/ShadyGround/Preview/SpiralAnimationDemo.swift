@@ -129,7 +129,7 @@ public struct CustomAnimatedSpiral: View {
                 switch animationType {
                 case .smooth:
                     AnimatedSpiralBackground(
-                        stripesPerTurn: 8.0,
+                        stripesPerTurn: 1.0,
                         baseTwist: 1.0,
                         twistAmplitude: 2.0,
                         animationSpeed: 1.0,
@@ -138,7 +138,7 @@ public struct CustomAnimatedSpiral: View {
                     
                 case .fast:
                     AnimatedSpiralBackground(
-                        stripesPerTurn: 12.0,
+                        stripesPerTurn: 1.0,
                         baseTwist: 0.5,
                         twistAmplitude: 4.0,
                         animationSpeed: 3.0,
@@ -147,7 +147,7 @@ public struct CustomAnimatedSpiral: View {
                     
                 case .slow:
                     AnimatedSpiralBackground(
-                        stripesPerTurn: 6.0,
+                        stripesPerTurn: 1.0,
                         baseTwist: 2.0,
                         twistAmplitude: 1.0,
                         animationSpeed: 0.5,
@@ -156,7 +156,7 @@ public struct CustomAnimatedSpiral: View {
                     
                 case .complex:
                     AnimatedSpiralBackground(
-                        stripesPerTurn: 10.0,
+                        stripesPerTurn: 1.0,
                         baseTwist: 1.5,
                         twistAmplitude: 3.5,
                         animationSpeed: 1.5,

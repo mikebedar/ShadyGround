@@ -9,19 +9,14 @@
 #include <SwiftUI/SwiftUI_Metal.h>
 using namespace metal;
 
-inline half4 paletteAt(int i,
-                       int n,
+// Simple palette with up to 8 colors (clean and efficient)
+inline half4 paletteAt(int i, int n,
                        half4 c0, half4 c1, half4 c2, half4 c3,
-                       half4 c4, half4 c5, half4 c6, half4 c7,
-                       half4 c8, half4 c9, half4 c10, half4 c11,
-                       half4 c12, half4 c13, half4 c14, half4 c15)
-{
+                       half4 c4, half4 c5, half4 c6, half4 c7) {
     i = (n > 0) ? (i % n) : 0;
     switch (i) {
         case 0: return c0;  case 1: return c1;  case 2: return c2;  case 3: return c3;
-        case 4: return c4;  case 5: return c5;  case 6: return c6;  case 7: return c7;
-        case 8: return c8;  case 9: return c9;  case 10: return c10; case 11: return c11;
-        case 12: return c12; case 13: return c13; case 14: return c14; default: return c15;
+        case 4: return c4;  case 5: return c5;  case 6: return c6;  default: return c7;
     }
 }
 
@@ -36,11 +31,9 @@ half4 spiralStripes(float2 position, SwiftUI::Layer layer,
                     float stripesPerTurn,     // bands per 2π
                     float twist,              // strength of log(r) term
                     float2 centerOffsetPx,
-                    float paletteCount,       // 1…16
+                    float paletteCount,       // 1…8
                     half4 c0, half4 c1, half4 c2, half4 c3,
-                    half4 c4, half4 c5, half4 c6, half4 c7,
-                    half4 c8, half4 c9, half4 c10, half4 c11,
-                    half4 c12, half4 c13, half4 c14, half4 c15)
+                    half4 c4, half4 c5, half4 c6, half4 c7)
 {
     float2 center = 0.5 * viewSize + centerOffsetPx;
     float2 p = position - center;
@@ -79,12 +72,12 @@ half4 spiralStripes(float2 position, SwiftUI::Layer layer,
     float coverage = smoothstep(0.0, aaBands, distToEdge);
 
     // --- Palette (repeat cyclically) ---
-    int n = clamp(int(paletteCount), 1, 16);
+    int n = clamp(int(paletteCount), 1, 8);
     int idx  = clamp(int(floor(pWrap * float(n))), 0, n - 1);
     int idxN = (idx + 1) % n;
 
-    half4 base = paletteAt(idx, n, c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15);
-    half4 next = paletteAt(idxN, n, c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15);
+    half4 base = paletteAt(idx, n, c0,c1,c2,c3,c4,c5,c6,c7);
+    half4 next = paletteAt(idxN, n, c0,c1,c2,c3,c4,c5,c6,c7);
 
     // Slight cross-fade near the edge for crisp AA
     half4 color = mix(next, base, half(coverage));

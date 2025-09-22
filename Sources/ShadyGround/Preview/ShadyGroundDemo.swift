@@ -10,7 +10,7 @@ import SwiftUI
 /// A comprehensive demo showcasing all available shader effects
 @MainActor
 public struct ShadyGroundDemo: View {
-    @State private var selectedEffect: String = "Spiral"
+    @State private var selectedEffect: String = "Wave"
     @State private var selectedCategory: String = "All"
     
     private let effects: [String: any ShaderEffect.Type] = [

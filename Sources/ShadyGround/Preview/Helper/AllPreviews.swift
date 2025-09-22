@@ -488,8 +488,8 @@ extension StripeBackground {
 public struct StripePreview: View {
     @State private var stripeWidth: CGFloat = 20
     @State private var angle: Double = 0
-    @State private var backgroundColor: Color = .gray.opacity(0.0)
-    @State private var foregroundColor: Color = .gray.opacity(0.2)
+    @State private var colorCount: CGFloat = 2
+    @State private var colors: [Color] = [.gray.opacity(0.0), .gray.opacity(0.2)]
     
     public var body: some View {
         VStack(spacing: 0) {
@@ -497,8 +497,7 @@ public struct StripePreview: View {
             StripeBackground(
                 stripeWidth: stripeWidth,
                 angle: angle,
-                backgroundColor: backgroundColor,
-                foregroundColor: foregroundColor
+                colors: colors
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .clipped()
@@ -531,14 +530,11 @@ public struct StripePreview: View {
                         value: $angle
                     )
                     
-                    ColorParameterControl(
-                        title: "Background Color",
-                        value: $backgroundColor
-                    )
-                    
-                    ColorParameterControl(
-                        title: "Foreground Color",
-                        value: $foregroundColor
+                    NumericParameterControl(
+                        title: "Color Count",
+                        value: $colorCount,
+                        in: 2...8,
+                        step: 1
                     )
                 }
             }
@@ -546,12 +542,15 @@ public struct StripePreview: View {
         .onAppear {
             randomizeColors()
         }
+        .onChange(of: colorCount) { _, _ in
+            randomizeColors()
+        }
     }
     
     private func randomizeColors() {
-        let (baseColor, complementaryColor) = ColorUtils.randomColorPair()
-        backgroundColor = baseColor
-        foregroundColor = complementaryColor
+        let colorOptions: [Color] = [.red, .orange, .yellow, .green, .blue, .purple, .pink, .cyan, .mint, .indigo]
+        let selectedColors = Array(colorOptions.shuffled().prefix(Int(colorCount)))
+        colors = selectedColors
     }
 }
 
@@ -570,8 +569,8 @@ public struct WavePreview: View {
     @State private var backgroundStripeWidth: CGFloat = 25
     @State private var phase: Double = 0
     @State private var angle: Double = 0
-    @State private var backgroundColor: Color = .gray.opacity(0.0)
-    @State private var foregroundColor: Color = .gray.opacity(0.2)
+    @State private var colorCount: CGFloat = 2
+    @State private var colors: [Color] = [.gray.opacity(0.0), .gray.opacity(0.2)]
     
     public var body: some View {
         VStack(spacing: 0) {
@@ -583,8 +582,7 @@ public struct WavePreview: View {
                 backgroundStripeWidth: backgroundStripeWidth,
                 phase: phase,
                 angle: angle,
-                backgroundColor: backgroundColor,
-                foregroundColor: foregroundColor
+                colors: colors
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .clipped()
@@ -643,14 +641,11 @@ public struct WavePreview: View {
                         value: $angle
                     )
                     
-                    ColorParameterControl(
-                        title: "Background Color",
-                        value: $backgroundColor
-                    )
-                    
-                    ColorParameterControl(
-                        title: "Foreground Color",
-                        value: $foregroundColor
+                    NumericParameterControl(
+                        title: "Color Count",
+                        value: $colorCount,
+                        in: 2...8,
+                        step: 1
                     )
                 }
             }
@@ -658,12 +653,15 @@ public struct WavePreview: View {
         .onAppear {
             randomizeColors()
         }
+        .onChange(of: colorCount) { _, _ in
+            randomizeColors()
+        }
     }
     
     private func randomizeColors() {
-        let (baseColor, complementaryColor) = ColorUtils.randomColorPair()
-        backgroundColor = baseColor
-        foregroundColor = complementaryColor
+        let colorOptions: [Color] = [.red, .orange, .yellow, .green, .blue, .purple, .pink, .cyan, .mint, .indigo]
+        let selectedColors = Array(colorOptions.shuffled().prefix(Int(colorCount)))
+        colors = selectedColors
     }
 }
 
@@ -680,7 +678,7 @@ public struct SpiralPreview: View {
     @State private var stripesPerTurn: CGFloat = 8.0
     @State private var twist: CGFloat = 1.0
     @State private var centerOffsetPx: CGSize = .zero
-    @State private var paletteCount: CGFloat = 4.0
+    @State private var colorCount: CGFloat = 4
     @State private var colors: [Color] = [.red, .orange, .yellow, .green]
     
     public var body: some View {
@@ -690,7 +688,6 @@ public struct SpiralPreview: View {
                 stripesPerTurn: stripesPerTurn,
                 twist: twist,
                 centerOffsetPx: centerOffsetPx,
-                paletteCount: paletteCount,
                 colors: colors
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -746,11 +743,10 @@ public struct SpiralPreview: View {
                         step: 5
                     )
                     
-                    
                     NumericParameterControl(
-                        title: "Palette Count",
-                        value: $paletteCount,
-                        in: 1...16,
+                        title: "Color Count",
+                        value: $colorCount,
+                        in: 1...8,
                         step: 1
                     )
                 }
@@ -759,11 +755,14 @@ public struct SpiralPreview: View {
         .onAppear {
             randomizeColors()
         }
+        .onChange(of: colorCount) { _, _ in
+            randomizeColors()
+        }
     }
     
     private func randomizeColors() {
         let colorOptions: [Color] = [.red, .orange, .yellow, .green, .blue, .purple, .pink, .cyan, .mint, .indigo]
-        let selectedColors = Array(colorOptions.shuffled().prefix(Int(paletteCount)))
+        let selectedColors = Array(colorOptions.shuffled().prefix(Int(colorCount)))
         colors = selectedColors
     }
 }

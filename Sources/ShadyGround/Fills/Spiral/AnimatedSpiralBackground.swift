@@ -14,7 +14,7 @@ public struct AnimatedSpiralBackground: View {
     public let twistAmplitude: CGFloat
     public let animationSpeed: Double
     public let centerOffsetPx: CGSize
-    public let paletteCount: CGFloat
+    public let paletteCount: Int
     public let colors: [Color]
     
     public init(
@@ -23,7 +23,6 @@ public struct AnimatedSpiralBackground: View {
         twistAmplitude: CGFloat = 2000.0,
         animationSpeed: Double = 0.25,
         centerOffsetPx: CGSize = .zero,
-        paletteCount: CGFloat = 4.0,
         colors: [Color] = [.red, .orange, .yellow, .green]
     ) {
         self.stripesPerTurn = stripesPerTurn
@@ -31,8 +30,8 @@ public struct AnimatedSpiralBackground: View {
         self.twistAmplitude = twistAmplitude
         self.animationSpeed = animationSpeed
         self.centerOffsetPx = centerOffsetPx
-        self.paletteCount = paletteCount
         self.colors = colors
+        self.paletteCount = min(colors.count, 8)
     }
     
     public var body: some View {
@@ -50,31 +49,26 @@ public struct AnimatedSpiralBackground: View {
         // Calculate animated twist value using sine wave
         let animatedTwist = baseTwist + twistAmplitude * sin(time * animationSpeed)
         
-        // Ensure we have at least 4 colors and pad with the last color if needed
-        let paddedColors = Array(colors.prefix(16)) + Array(repeating: colors.last ?? .black, count: max(0, 16 - colors.count))
+        // Ensure we have at least 1 color and pad with the last color if needed (max 8 colors)
+        let paddedColors = Array(colors.prefix(8)) + Array(repeating: colors.last ?? .black, count: max(0, 8 - colors.count))
         
-        return ShadyGroundLibrary.default.spiralStripes(
-            .float2(Float(size.width), Float(size.height)),
-            .float(stripesPerTurn),
-            .float(animatedTwist),
-            .float2(Float(centerOffsetPx.width), Float(centerOffsetPx.height)),
-            .float(paletteCount),
-            .color(paddedColors[0]),
-            .color(paddedColors[1]),
-            .color(paddedColors[2]),
-            .color(paddedColors[3]),
-            .color(paddedColors[4]),
-            .color(paddedColors[5]),
-            .color(paddedColors[6]),
-            .color(paddedColors[7]),
-            .color(paddedColors[8]),
-            .color(paddedColors[9]),
-            .color(paddedColors[10]),
-            .color(paddedColors[11]),
-            .color(paddedColors[12]),
-            .color(paddedColors[13]),
-            .color(paddedColors[14]),
-            .color(paddedColors[15])
+        return Shader(
+            function: .init(library: ShadyGroundLibrary.default, name: "spiralStripes"),
+            arguments: [
+                .float2(Float(size.width), Float(size.height)),
+                .float(stripesPerTurn),
+                .float(animatedTwist),
+                .float2(Float(centerOffsetPx.width), Float(centerOffsetPx.height)),
+                .float(Float(paletteCount)),
+                .color(paddedColors[0]),
+                .color(paddedColors[1]),
+                .color(paddedColors[2]),
+                .color(paddedColors[3]),
+                .color(paddedColors[4]),
+                .color(paddedColors[5]),
+                .color(paddedColors[6]),
+                .color(paddedColors[7])
+            ]
         )
     }
 }
@@ -83,11 +77,11 @@ public struct AnimatedSpiralBackground: View {
 #if DEBUG
 #Preview("Animated Spiral") {
     AnimatedSpiralBackground(
-        stripesPerTurn: 6.0,
-        baseTwist: 1.0,
-        twistAmplitude: 10.0,
-        animationSpeed: 0.25,
-        colors: [.purple, .blue, .cyan, .green, .yellow, .orange]
+        stripesPerTurn: 1.0,
+        baseTwist: 0.1,
+        twistAmplitude: 0.1,
+        animationSpeed: 0.0005,
+        colors: [.red, .orange, .yellow, .green, .blue, .cyan, .purple]
     )
     .frame(width: 300, height: 300)
 }
