@@ -59,7 +59,7 @@ ShadyGround includes 7 beautiful shader effects, each with customizable paramete
 ### Checkerboard Pattern
 A classic alternating square pattern with rotation support.
 
-![Checkerboard Pattern](Images/checkerboard.png)
+<img src="Images/checkerboard.png" width="200" alt="Checkerboard Pattern">
 
 ```swift
 CheckerboardBackground(
@@ -73,7 +73,7 @@ CheckerboardBackground(
 ### Diagonal Stripes
 Clean diagonal stripes with customizable width and angle. Supports 2-8 colors for vibrant patterns.
 
-![Stripe Pattern](Images/stripes.png)
+<img src="Images/stripes.png" width="200" alt="Stripe Pattern">
 
 ```swift
 StripeBackground(
@@ -86,7 +86,7 @@ StripeBackground(
 ### Polka Dots
 Circular dots arranged in a grid pattern.
 
-![Dots Pattern](Images/dots.png)
+<img src="Images/dots.png" width="200" alt="Dots Pattern">
 
 ```swift
 DotsBackground(
@@ -101,7 +101,7 @@ DotsBackground(
 ### Wave Pattern
 Smooth wave-like stripes with amplitude and frequency control. Supports 2-8 colors for rich, dynamic patterns.
 
-![Wave Pattern](Images/wave.png)
+<img src="Images/wave.png" width="200" alt="Wave Pattern">
 
 ```swift
 WaveBackground(
@@ -118,7 +118,7 @@ WaveBackground(
 ### Grid Pattern
 Clean grid lines with customizable spacing and line width.
 
-![Grid Pattern](Images/grid.png)
+<img src="Images/grid.png" width="200" alt="Grid Pattern">
 
 ```swift
 GridBackground(
@@ -133,7 +133,7 @@ GridBackground(
 ### Noise Pattern
 TV-static style noise with fractal properties and customizable intensity.
 
-![Noise Pattern](Images/noise.png)
+<img src="Images/noise.png" width="200" alt="Noise Pattern">
 
 ```swift
 NoiseBackground(
@@ -152,7 +152,7 @@ NoiseBackground(
 ### Spiral Pattern
 Dynamic spiral stripes with customizable twist and color palette. Supports 2-8 colors for stunning visual effects.
 
-![Spiral Pattern](Images/swirl.png)
+<img src="Images/swirl.png" width="200" alt="Spiral Pattern">
 
 ```swift
 SpiralBackground(
