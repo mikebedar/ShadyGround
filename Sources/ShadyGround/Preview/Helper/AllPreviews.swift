@@ -666,3 +666,104 @@ public struct WavePreview: View {
         foregroundColor = complementaryColor
     }
 }
+
+
+// Spiral Preview
+extension SpiralBackground {
+    public static func previewView() -> some View {
+        SpiralPreview()
+    }
+}
+
+@MainActor
+public struct SpiralPreview: View {
+    @State private var stripesPerTurn: CGFloat = 8.0
+    @State private var twist: CGFloat = 1.0
+    @State private var centerOffsetPx: CGSize = .zero
+    @State private var paletteCount: CGFloat = 4.0
+    @State private var colors: [Color] = [.red, .orange, .yellow, .green]
+    
+    public var body: some View {
+        VStack(spacing: 0) {
+            // Main preview
+            SpiralBackground(
+                stripesPerTurn: stripesPerTurn,
+                twist: twist,
+                centerOffsetPx: centerOffsetPx,
+                paletteCount: paletteCount,
+                colors: colors
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .clipped()
+            
+            // Parameter controls
+            VStack(spacing: 16) {
+                // Randomize button
+                Button(action: randomizeColors) {
+                    HStack {
+                        Image(systemName: "shuffle")
+                        Text("Randomize Colors")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(.blue, in: Capsule())
+                }
+                
+                ParameterControlGrid {
+                    NumericParameterControl(
+                        title: "Stripes Per Turn",
+                        value: $stripesPerTurn,
+                        in: 1...20,
+                        step: 1
+                    )
+                    
+                    NumericParameterControl(
+                        title: "Twist",
+                        value: $twist,
+                        in: 0...4,
+                        step: 0.1
+                    )
+                    
+                    NumericParameterControl(
+                        title: "Center Offset X",
+                        value: Binding(
+                            get: { centerOffsetPx.width },
+                            set: { centerOffsetPx.width = $0 }
+                        ),
+                        in: -100...100,
+                        step: 5
+                    )
+                    
+                    NumericParameterControl(
+                        title: "Center Offset Y",
+                        value: Binding(
+                            get: { centerOffsetPx.height },
+                            set: { centerOffsetPx.height = $0 }
+                        ),
+                        in: -100...100,
+                        step: 5
+                    )
+                    
+                    
+                    NumericParameterControl(
+                        title: "Palette Count",
+                        value: $paletteCount,
+                        in: 1...16,
+                        step: 1
+                    )
+                }
+            }
+        }
+        .onAppear {
+            randomizeColors()
+        }
+    }
+    
+    private func randomizeColors() {
+        let colorOptions: [Color] = [.red, .orange, .yellow, .green, .blue, .purple, .pink, .cyan, .mint, .indigo]
+        let selectedColors = Array(colorOptions.shuffled().prefix(Int(paletteCount)))
+        colors = selectedColors
+    }
+}

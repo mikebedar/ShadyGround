@@ -106,3 +106,13 @@ extension BrickBackground: ShaderEffect {
         )
     }
 }
+
+extension SpiralBackground {
+    public static var effectConfig: ShaderEffectConfig {
+        ShaderEffectConfig(
+            name: effectName,
+            description: effectDescription,
+            category: effectCategory
+        )
+    }
+}

@@ -10,10 +10,11 @@ import SwiftUI
 /// A comprehensive demo showcasing all available shader effects
 @MainActor
 public struct ShadyGroundDemo: View {
-    @State private var selectedEffect: String = "Checkerboard"
+    @State private var selectedEffect: String = "Spiral"
     @State private var selectedCategory: String = "All"
     
     private let effects: [String: any ShaderEffect.Type] = [
+            "Spiral": SpiralBackground.self,
             "Checkerboard": CheckerboardBackground.self,
             "Stripe": StripeBackground.self,
             "Dots": DotsBackground.self,
@@ -118,6 +119,8 @@ private struct ShaderEffectPreviewContainer: View {
             NoisePreview()
         case is BrickBackground.Type:
             BrickPreview()
+        case is SpiralBackground.Type:
+            SpiralPreview()
         default:
             Text("Preview not available")
                 .foregroundColor(.secondary)

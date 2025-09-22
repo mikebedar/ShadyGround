@@ -44,6 +44,6 @@ public struct WaveBackground: View {
     public var body: some View {
         Rectangle()
             .fill(.black)
-            .layerEffect(shader, maxSampleOffset: .zero)
+            .shadyLayerEffect(shader)
     }
 }

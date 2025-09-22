@@ -21,7 +21,7 @@ Add ShadyGround to your project using Swift Package Manager:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/your-org/ShadyGround.git", from: "1.0.0")
+    .package(url: "https://github.com/mikebedar/ShadyGround.git", from: "1.0.0")
 ]
 ```
 
@@ -32,30 +32,135 @@ import ShadyGround
 
 struct ContentView: View {
     var body: some View {
-        CheckerboardBackground()
-            .frame(width: 200, height: 200)
+        // Simple checkerboard pattern
+        CheckerboardBackground(
+            cellSize: 16,
+            backgroundColor: .blue.opacity(0.1),
+            foregroundColor: .blue.opacity(0.3)
+        )
+        .frame(width: 200, height: 200)
+        
+        // Or try a dynamic spiral
+        SpiralBackground(
+            stripesPerTurn: 6,
+            twist: 2.0,
+            colors: [.purple, .pink, .orange, .yellow]
+        )
+        .frame(width: 200, height: 200)
     }
 }
 ```
 
 ## Available Effects
 
-### Checkerboard Pattern
+ShadyGround includes 8 beautiful shader effects, each with customizable parameters:
+
+### 🏁 Checkerboard Pattern
+A classic alternating square pattern with rotation support.
+
 ```swift
 CheckerboardBackground(
-    cellSize: 16,
-    light: .blue.opacity(0.3),
-    dark: .purple.opacity(0.1)
+    cellSize: 16,           // Size of each square
+    angle: .pi / 4,         // Rotation angle in radians
+    backgroundColor: .blue.opacity(0.3),
+    foregroundColor: .purple.opacity(0.1)
 )
 ```
 
-### Diagonal Stripes
+### 📏 Diagonal Stripes
+Clean diagonal stripes with customizable width and angle.
+
 ```swift
 StripeBackground(
-    stripeWidth: 20,
-    angle: .pi / 4, // 45 degrees
-    light: .green.opacity(0.2),
-    dark: .orange.opacity(0.1)
+    stripeWidth: 20,        // Width of each stripe
+    angle: .pi / 4,         // Rotation angle in radians
+    backgroundColor: .green.opacity(0.2),
+    foregroundColor: .orange.opacity(0.1)
+)
+```
+
+### 🔴 Polka Dots
+Circular dots arranged in a grid pattern.
+
+```swift
+DotsBackground(
+    dotSize: 8,             // Diameter of each dot
+    spacing: 20,            // Distance between dot centers
+    angle: 0,               // Rotation angle in radians
+    backgroundColor: .white.opacity(0.1),
+    foregroundColor: .red.opacity(0.3)
+)
+```
+
+### 🌊 Wave Pattern
+Smooth wave-like stripes with amplitude and frequency control.
+
+```swift
+WaveBackground(
+    amplitude: 20,          // Height of wave peaks
+    frequency: 0.1,         // How many waves across the pattern
+    foregroundStripeWidth: 25,
+    backgroundStripeWidth: 25,
+    phase: 0,               // Wave offset
+    angle: 0,               // Rotation angle in radians
+    backgroundColor: .blue.opacity(0.1),
+    foregroundColor: .cyan.opacity(0.3)
+)
+```
+
+### 📐 Grid Pattern
+Clean grid lines with customizable spacing and line width.
+
+```swift
+GridBackground(
+    spacing: 20,            // Distance between grid lines
+    lineWidth: 1,           // Thickness of grid lines
+    angle: 0,               // Rotation angle in radians
+    backgroundColor: .clear,
+    foregroundColor: .gray.opacity(0.2)
+)
+```
+
+### 📺 Noise Pattern
+TV-static style noise with fractal properties and customizable intensity.
+
+```swift
+NoiseBackground(
+    scale: 1.0,             // Overall noise scale
+    intensity: 1.0,         // Noise visibility (0-1)
+    octaves: 4,             // Number of noise layers
+    persistence: 0.5,       // How much each octave contributes
+    seed: 0,                // Random seed for variation
+    angle: 0,               // Rotation angle in radians
+    backgroundColor: .clear,
+    foregroundColor: .gray.opacity(0.8)
+)
+```
+
+### 🧱 Brick Pattern
+Classic brick wall pattern with customizable dimensions and mortar.
+
+```swift
+BrickBackground(
+    brickWidth: 80,         // Width of each brick
+    brickHeight: 40,        // Height of each brick
+    mortarWidth: 4,         // Width of mortar lines
+    angle: 0,               // Rotation angle in radians
+    backgroundColor: .brown.opacity(0.1),
+    foregroundColor: .orange.opacity(0.3)
+)
+```
+
+### 🌀 Spiral Pattern
+Dynamic spiral stripes with customizable twist and color palette.
+
+```swift
+SpiralBackground(
+    stripesPerTurn: 8.0,    // Number of color bands per rotation
+    twist: 1.0,             // Logarithmic spiral twist factor
+    centerOffsetPx: .zero,  // Offset from center in pixels
+    paletteCount: 4.0,      // Number of colors to use
+    colors: [.red, .orange, .yellow, .green]
 )
 ```
 
@@ -64,57 +169,131 @@ StripeBackground(
 ### Animated Effects
 ```swift
 @State private var cellSize: CGFloat = 12
+@State private var spiralTwist: CGFloat = 1.0
 
 var body: some View {
-    CheckerboardBackground(cellSize: cellSize)
-        .onAppear {
-            withAnimation(.easeInOut(duration: 2).repeatForever()) {
-                cellSize = 24
-            }
+    VStack {
+        // Animated checkerboard
+        CheckerboardBackground(
+            cellSize: cellSize,
+            backgroundColor: .clear,
+            foregroundColor: .blue.opacity(0.3)
+        )
+        
+        // Animated spiral
+        SpiralBackground(
+            stripesPerTurn: 8,
+            twist: spiralTwist,
+            colors: [.red, .orange, .yellow, .green]
+        )
+    }
+    .onAppear {
+        withAnimation(.easeInOut(duration: 2).repeatForever()) {
+            cellSize = 24
+            spiralTwist = 3.0
         }
+    }
 }
 ```
 
 ### Masked Effects
 ```swift
-StripeBackground()
-    .mask(
-        Circle()
-            .frame(width: 100, height: 100)
-    )
+SpiralBackground(
+    stripesPerTurn: 12,
+    twist: 2.0,
+    colors: [.purple, .blue, .cyan, .green]
+)
+.mask(
+    Circle()
+        .frame(width: 200, height: 200)
+)
 ```
 
 ### Layered Effects
 ```swift
 ZStack {
-    CheckerboardBackground()
-    StripeBackground()
-        .blendMode(.multiply)
+    // Base noise texture
+    NoiseBackground(
+        scale: 2.0,
+        intensity: 0.3,
+        backgroundColor: .clear,
+        foregroundColor: .gray.opacity(0.2)
+    )
+    
+    // Overlay with grid
+    GridBackground(
+        spacing: 30,
+        lineWidth: 2,
+        backgroundColor: .clear,
+        foregroundColor: .blue.opacity(0.4)
+    )
+    .blendMode(.multiply)
 }
+```
+
+### Size-Aware Effects
+```swift
+// Spiral automatically adapts to view size
+SpiralBackground(
+    stripesPerTurn: 6,
+    twist: 1.5,
+    centerOffsetPx: CGSize(width: 20, height: -10)
+)
+.frame(width: 300, height: 300)
+
+// Other effects work at any size
+NoiseBackground(
+    scale: 0.5,
+    intensity: 0.8,
+    octaves: 6
+)
+.frame(width: 150, height: 150)
 ```
 
 ## Preview System
 
-ShadyGround includes a comprehensive preview system for exploring effects:
+ShadyGround includes a comprehensive preview system for exploring all effects:
 
 ```swift
+// Use the built-in demo app
+import ShadyGround
+
+#Preview("ShadyGround Demo") {
+    ShadyGroundDemo()
+}
+
+// Or preview individual effects
 #Preview("Checkerboard Effect") {
-    ShaderEffectPreview<CheckerboardBackground>()
+    CheckerboardPreview()
+}
+
+#Preview("Spiral Effect") {
+    SpiralPreview()
 }
 ```
 
 The preview system provides:
-- Interactive parameter controls
-- Real-time effect updates
-- Parameter value displays
-- Organized control layouts
+- 🎛️ **Interactive Controls**: Real-time sliders, color pickers, and parameter adjustments
+- 🔄 **Live Updates**: See changes instantly as you adjust parameters
+- 📊 **Parameter Display**: Current values shown for all controls
+- 🎨 **Visual Feedback**: Immediate preview of all 8 effects
+- 📱 **Organized Layout**: Clean, intuitive control interface
+
+### Running the Demo
+The `ShadyGroundDemo` provides a complete interactive showcase of all effects with:
+- Effect selection dropdown
+- Category filtering
+- Full parameter controls for each effect
+- Real-time preview updates
 
 ## Creating Custom Effects
 
 To create your own shader effects, conform to the `ShaderEffect` protocol:
 
 ```swift
-public struct MyCustomEffect: View {
+import SwiftUI
+
+public struct MyCustomEffect: View, ShaderEffect {
     public let parameter1: CGFloat
     public let parameter2: Color
     
@@ -126,19 +305,54 @@ public struct MyCustomEffect: View {
     public var body: some View {
         Rectangle()
             .fill(.black)
-            .layerEffect(
-                ShaderLibrary.default.myCustomShader(
-                    .float(parameter1),
-                    .color(parameter2)
-                ),
-                maxSampleOffset: .zero
-            )
+            .shadyLayerEffect(shader)
     }
     
-    // MARK: - Preview Implementation
-    public static func previewView() -> some View {
-        MyCustomPreview()
+    private var shader: Shader {
+        ShadyGroundLibrary.default.myCustomShader(
+            .float(parameter1),
+            .color(parameter2)
+        )
     }
+}
+
+// MARK: - ShaderEffect Protocol Conformance
+extension MyCustomEffect {
+    public static let effectName = "My Custom Effect"
+    public static let effectDescription = "A custom shader effect"
+    public static let effectCategory = "Custom"
+    
+    public static var effectConfig: ShaderEffectConfig {
+        ShaderEffectConfig(
+            name: effectName,
+            description: effectDescription,
+            category: effectCategory,
+            parameters: [
+                .float("Parameter 1", range: 0...100, defaultValue: 10),
+                .color("Parameter 2", defaultValue: .blue)
+            ]
+        )
+    }
+}
+```
+
+### For Size-Aware Effects
+If your effect needs to adapt to view size (like the Spiral), use `SizeAwareShaderModifier`:
+
+```swift
+public var body: some View {
+    Rectangle()
+        .fill(.black)
+        .sizeAwareShaderEffect { size in
+            makeShader(for: size)
+        }
+}
+
+private func makeShader(for size: CGSize) -> Shader {
+    ShadyGroundLibrary.default.mySizeAwareShader(
+        .float2(Float(size.width), Float(size.height)),
+        .float(parameter1)
+    )
 }
 ```
 

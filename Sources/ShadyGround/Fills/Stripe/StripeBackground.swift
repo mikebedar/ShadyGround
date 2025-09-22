@@ -20,17 +20,18 @@ public struct StripeBackground: View {
         self.foregroundColor = foregroundColor
     }
 
+    private var shader: Shader {
+        ShadyGroundLibrary.default.stripe(
+            .float(stripeWidth),
+            .float(angle),
+            .color(backgroundColor),
+            .color(foregroundColor)
+        )
+    }
+
     public var body: some View {
         Rectangle()
             .fill(.black)
-            .layerEffect(
-                ShadyGroundLibrary.default.stripe(
-                    .float(stripeWidth),
-                    .float(angle),
-                    .color(backgroundColor),
-                    .color(foregroundColor)
-                ),
-                maxSampleOffset: .zero
-            )
+            .shadyLayerEffect(shader)
     }
 }

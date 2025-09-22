@@ -35,7 +35,7 @@ public struct DotsBackground: View {
     public var body: some View {
         Rectangle()
             .fill(.black)
-            .layerEffect(shader, maxSampleOffset: .zero)
+            .shadyLayerEffect(shader)
     }
 }
 
