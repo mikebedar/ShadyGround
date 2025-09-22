@@ -70,6 +70,37 @@ CheckerboardBackground(
 )
 ```
 
+### Spiral Pattern
+Dynamic spiral stripes with customizable twist and color palette. Supports 2-8 colors for stunning visual effects.
+
+<img src="Images/swirl.png" width="200" alt="Spiral Pattern">
+
+```swift
+SpiralBackground(
+    stripesPerTurn: 8.0,    // Number of color bands per rotation
+    twist: 1.0,             // Logarithmic spiral twist factor
+    centerOffsetPx: .zero,  // Offset from center in pixels
+    colors: [.red, .orange, .yellow, .green, .blue, .purple]  // 2-8 colors
+)
+```
+
+### Wave Pattern
+Smooth wave-like stripes with amplitude and frequency control. Supports 2-8 colors for rich, dynamic patterns.
+
+<img src="Images/wave.png" width="200" alt="Wave Pattern">
+
+```swift
+WaveBackground(
+    amplitude: 20,          // Height of wave peaks
+    frequency: 0.1,         // How many waves across the pattern
+    foregroundStripeWidth: 25,
+    backgroundStripeWidth: 25,
+    phase: 0,               // Wave offset
+    angle: 0,               // Rotation angle in radians
+    colors: [.blue, .cyan, .purple, .pink]  // 2-8 colors
+)
+```
+
 ### Diagonal Stripes
 Clean diagonal stripes with customizable width and angle. Supports 2-8 colors for vibrant patterns.
 
@@ -95,23 +126,6 @@ DotsBackground(
     angle: 0,               // Rotation angle in radians
     backgroundColor: .white.opacity(0.1),
     foregroundColor: .red.opacity(0.3)
-)
-```
-
-### Wave Pattern
-Smooth wave-like stripes with amplitude and frequency control. Supports 2-8 colors for rich, dynamic patterns.
-
-<img src="Images/wave.png" width="200" alt="Wave Pattern">
-
-```swift
-WaveBackground(
-    amplitude: 20,          // Height of wave peaks
-    frequency: 0.1,         // How many waves across the pattern
-    foregroundStripeWidth: 25,
-    backgroundStripeWidth: 25,
-    phase: 0,               // Wave offset
-    angle: 0,               // Rotation angle in radians
-    colors: [.blue, .cyan, .purple, .pink]  // 2-8 colors
 )
 ```
 
@@ -148,89 +162,8 @@ NoiseBackground(
 )
 ```
 
-
-### Spiral Pattern
-Dynamic spiral stripes with customizable twist and color palette. Supports 2-8 colors for stunning visual effects.
-
-<img src="Images/swirl.png" width="200" alt="Spiral Pattern">
-
-```swift
-SpiralBackground(
-    stripesPerTurn: 8.0,    // Number of color bands per rotation
-    twist: 1.0,             // Logarithmic spiral twist factor
-    centerOffsetPx: .zero,  // Offset from center in pixels
-    colors: [.red, .orange, .yellow, .green, .blue, .purple]  // 2-8 colors
-)
-```
-
-## Color Palette Features
-
-ShadyGround supports rich color palettes for several effects, allowing you to create vibrant, multi-color patterns:
-
-### Multi-Color Effects
-- **Spiral Pattern**: 2-8 colors with automatic cycling
-- **Stripe Pattern**: 2-8 colors with automatic cycling  
-- **Wave Pattern**: 2-8 colors with automatic cycling
-
-### Color Palette Examples
-```swift
-// Rainbow spiral
-SpiralBackground(
-    stripesPerTurn: 12,
-    twist: 2.0,
-    colors: [.red, .orange, .yellow, .green, .blue, .indigo, .purple]
-)
-
-// Ocean wave stripes
-StripeBackground(
-    stripeWidth: 30,
-    angle: .pi / 6,
-    colors: [.blue, .cyan, .teal, .mint]
-)
-
-// Sunset wave pattern
-WaveBackground(
-    amplitude: 25,
-    frequency: 0.15,
-    colors: [.orange, .pink, .purple, .red]
-)
-```
-
-## Advanced Usage
-
-### Animated Effects
-```swift
-@State private var cellSize: CGFloat = 12
-@State private var dotSize: CGFloat = 8
-
-var body: some View {
-    VStack {
-        // Animated checkerboard
-        CheckerboardBackground(
-            cellSize: cellSize,
-            backgroundColor: .clear,
-            foregroundColor: .blue.opacity(0.3)
-        )
-        
-        // Animated dots
-        DotsBackground(
-            dotSize: dotSize,
-            spacing: 20,
-            backgroundColor: .clear,
-            foregroundColor: .red.opacity(0.6)
-        )
-    }
-    .onAppear {
-        withAnimation(.easeInOut(duration: 2).repeatForever()) {
-            cellSize = 24
-            dotSize = 16
-        }
-    }
-}
-```
-
-### Time-Based Animation
-For effects that support time-based animation, use `AnimatedSpiralBackground`:
+## Time-Based Animation
+Example of an animated use case with `AnimatedSpiralBackground`:
 
 ```swift
 // Automatically animates the spiral twist over time
@@ -241,26 +174,6 @@ AnimatedSpiralBackground(
     animationSpeed: 1.0,
     colors: [.red, .orange, .yellow, .green, .blue, .purple]
 )
-```
-
-### Size-Aware Effects
-```swift
-// Spiral automatically adapts to view size
-SpiralBackground(
-    stripesPerTurn: 6,
-    twist: 1.5,
-    centerOffsetPx: CGSize(width: 20, height: -10),
-    colors: [.red, .orange, .yellow, .green, .blue, .purple]
-)
-.frame(width: 300, height: 300)
-
-// Other effects work at any size
-NoiseBackground(
-    scale: 0.5,
-    intensity: 0.8,
-    octaves: 6
-)
-.frame(width: 150, height: 150)
 ```
 
 ## Requirements
