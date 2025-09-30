@@ -471,15 +471,31 @@ public struct StripePreview: View {
         let count = Int(colorCount)
         var generatedColors: [Color] = []
         
-        // Generate evenly distributed hues across the color spectrum
-        for i in 0..<count {
-            let hue = Double(i) / Double(count)
-            let saturation = 0.6 + Double.random(in: 0...0.4)
-            let brightness = 0.6 + Double.random(in: 0...0.4)
-            generatedColors.append(Color(hue: hue, saturation: saturation, brightness: brightness))
+        // Pick 2-4 random anchor hues to cluster around
+        let anchorCount = Int.random(in: 2...min(4, max(2, count)))
+        var anchorHues: [Double] = []
+        for _ in 0..<anchorCount {
+            anchorHues.append(Double.random(in: 0...1))
         }
         
-        colors = generatedColors
+        // Generate colors clustered around anchor hues with organic variation
+        for _ in 0..<count {
+            // Pick a random anchor to cluster around
+            let baseHue = anchorHues.randomElement() ?? 0.5
+            
+            // Add organic variation around the anchor
+            let hueVariation = Double.random(in: -0.15...0.15)
+            let hue = (baseHue + hueVariation).truncatingRemainder(dividingBy: 1.0)
+            
+            // More varied saturation and brightness for organic feel
+            let saturation = Double.random(in: 0.3...1.0)
+            let brightness = Double.random(in: 0.4...1.0)
+            
+            generatedColors.append(Color(hue: hue < 0 ? hue + 1 : hue, saturation: saturation, brightness: brightness))
+        }
+        
+        // Shuffle for more randomness
+        colors = generatedColors.shuffled()
     }
     
     private func generateGradient() {
@@ -613,15 +629,31 @@ public struct WavePreview: View {
         let count = Int(colorCount)
         var generatedColors: [Color] = []
         
-        // Generate evenly distributed hues across the color spectrum
-        for i in 0..<count {
-            let hue = Double(i) / Double(count)
-            let saturation = 0.6 + Double.random(in: 0...0.4)
-            let brightness = 0.6 + Double.random(in: 0...0.4)
-            generatedColors.append(Color(hue: hue, saturation: saturation, brightness: brightness))
+        // Pick 2-4 random anchor hues to cluster around
+        let anchorCount = Int.random(in: 2...min(4, max(2, count)))
+        var anchorHues: [Double] = []
+        for _ in 0..<anchorCount {
+            anchorHues.append(Double.random(in: 0...1))
         }
         
-        colors = generatedColors
+        // Generate colors clustered around anchor hues with organic variation
+        for _ in 0..<count {
+            // Pick a random anchor to cluster around
+            let baseHue = anchorHues.randomElement() ?? 0.5
+            
+            // Add organic variation around the anchor
+            let hueVariation = Double.random(in: -0.15...0.15)
+            let hue = (baseHue + hueVariation).truncatingRemainder(dividingBy: 1.0)
+            
+            // More varied saturation and brightness for organic feel
+            let saturation = Double.random(in: 0.3...1.0)
+            let brightness = Double.random(in: 0.4...1.0)
+            
+            generatedColors.append(Color(hue: hue < 0 ? hue + 1 : hue, saturation: saturation, brightness: brightness))
+        }
+        
+        // Shuffle for more randomness
+        colors = generatedColors.shuffled()
     }
 }
 
@@ -724,14 +756,30 @@ public struct SpiralPreview: View {
         let count = Int(colorCount)
         var generatedColors: [Color] = []
         
-        // Generate evenly distributed hues across the color spectrum
-        for i in 0..<count {
-            let hue = Double(i) / Double(count)
-            let saturation = 0.6 + Double.random(in: 0...0.4)
-            let brightness = 0.6 + Double.random(in: 0...0.4)
-            generatedColors.append(Color(hue: hue, saturation: saturation, brightness: brightness))
+        // Pick 2-4 random anchor hues to cluster around
+        let anchorCount = Int.random(in: 2...min(4, max(2, count)))
+        var anchorHues: [Double] = []
+        for _ in 0..<anchorCount {
+            anchorHues.append(Double.random(in: 0...1))
         }
         
-        colors = generatedColors
+        // Generate colors clustered around anchor hues with organic variation
+        for _ in 0..<count {
+            // Pick a random anchor to cluster around
+            let baseHue = anchorHues.randomElement() ?? 0.5
+            
+            // Add organic variation around the anchor
+            let hueVariation = Double.random(in: -0.15...0.15)
+            let hue = (baseHue + hueVariation).truncatingRemainder(dividingBy: 1.0)
+            
+            // More varied saturation and brightness for organic feel
+            let saturation = Double.random(in: 0.3...1.0)
+            let brightness = Double.random(in: 0.4...1.0)
+            
+            generatedColors.append(Color(hue: hue < 0 ? hue + 1 : hue, saturation: saturation, brightness: brightness))
+        }
+        
+        // Shuffle for more randomness
+        colors = generatedColors.shuffled()
     }
 }

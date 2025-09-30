@@ -56,6 +56,7 @@ public struct AnimatedSpiralBackground: View {
                 .float(stripesPerTurn),
                 .float(animatedTwist),
                 .float2(Float(centerOffsetPx.width), Float(centerOffsetPx.height)),
+                .float(0.0), // antialiasingLevel (disabled for animation performance)
                 .colorArray(palette)
             ]
         )
