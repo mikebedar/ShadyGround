@@ -19,23 +19,12 @@ public struct StripeBackground: View {
     }
 
     private var shader: Shader {
-        // Ensure we have at least 1 color and pad with the last color if needed (max 8 colors)
-        let paddedColors = Array(colors.prefix(8)) + Array(repeating: colors.last ?? .black, count: max(0, 8 - colors.count))
-        
-        return Shader(
+        Shader(
             function: .init(library: ShadyGroundLibrary.default, name: "stripe"),
             arguments: [
                 .float(stripeWidth),
                 .float(angle),
-                .float(Float(min(colors.count, 8))),
-                .color(paddedColors[0]),
-                .color(paddedColors[1]),
-                .color(paddedColors[2]),
-                .color(paddedColors[3]),
-                .color(paddedColors[4]),
-                .color(paddedColors[5]),
-                .color(paddedColors[6]),
-                .color(paddedColors[7])
+                .colorArray(colors.isEmpty ? [.black] : colors)
             ]
         )
     }

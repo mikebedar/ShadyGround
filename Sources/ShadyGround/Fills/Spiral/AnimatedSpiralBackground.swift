@@ -14,7 +14,6 @@ public struct AnimatedSpiralBackground: View {
     public let twistAmplitude: CGFloat
     public let animationSpeed: Double
     public let centerOffsetPx: CGSize
-    public let paletteCount: Int
     public let colors: [Color]
     
     public init(
@@ -31,7 +30,6 @@ public struct AnimatedSpiralBackground: View {
         self.animationSpeed = animationSpeed
         self.centerOffsetPx = centerOffsetPx
         self.colors = colors
-        self.paletteCount = min(colors.count, 8)
     }
     
     public var body: some View {
@@ -49,8 +47,7 @@ public struct AnimatedSpiralBackground: View {
         // Calculate animated twist value using sine wave
         let animatedTwist = baseTwist + twistAmplitude * sin(time * animationSpeed)
         
-        // Ensure we have at least 1 color and pad with the last color if needed (max 8 colors)
-        let paddedColors = Array(colors.prefix(8)) + Array(repeating: colors.last ?? .black, count: max(0, 8 - colors.count))
+        let palette = colors.isEmpty ? [.black] : colors
         
         return Shader(
             function: .init(library: ShadyGroundLibrary.default, name: "spiralStripes"),
@@ -59,15 +56,7 @@ public struct AnimatedSpiralBackground: View {
                 .float(stripesPerTurn),
                 .float(animatedTwist),
                 .float2(Float(centerOffsetPx.width), Float(centerOffsetPx.height)),
-                .float(Float(paletteCount)),
-                .color(paddedColors[0]),
-                .color(paddedColors[1]),
-                .color(paddedColors[2]),
-                .color(paddedColors[3]),
-                .color(paddedColors[4]),
-                .color(paddedColors[5]),
-                .color(paddedColors[6]),
-                .color(paddedColors[7])
+                .colorArray(palette)
             ]
         )
     }

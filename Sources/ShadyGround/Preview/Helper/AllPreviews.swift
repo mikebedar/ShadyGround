@@ -409,17 +409,32 @@ public struct StripePreview: View {
             
             // Parameter controls
             VStack(spacing: 16) {
-                // Randomize button
-                Button(action: randomizeColors) {
-                    HStack {
-                        Image(systemName: "shuffle")
-                        Text("Randomize Colors")
+                HStack(spacing: 12) {
+                    // Randomize button
+                    Button(action: randomizeColors) {
+                        HStack {
+                            Image(systemName: "shuffle")
+                            Text("Randomize Colors")
+                        }
+                        .font(.caption)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(.blue, in: Capsule())
                     }
-                    .font(.caption)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(.blue, in: Capsule())
+                    
+                    // Gradient button
+                    Button(action: generateGradient) {
+                        HStack {
+                            Image(systemName: "arrow.left.and.right")
+                            Text("Random Gradient")
+                        }
+                        .font(.caption)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(.purple, in: Capsule())
+                    }
                 }
                 
                 ParameterControlGrid {
@@ -438,7 +453,7 @@ public struct StripePreview: View {
                     NumericParameterControl(
                         title: "Color Count",
                         value: $colorCount,
-                        in: 2...8,
+                        in: 2...128,
                         step: 1
                     )
                 }
@@ -453,9 +468,48 @@ public struct StripePreview: View {
     }
     
     private func randomizeColors() {
-        let colorOptions: [Color] = [.red, .orange, .yellow, .green, .blue, .purple, .pink, .cyan, .mint, .indigo]
-        let selectedColors = Array(colorOptions.shuffled().prefix(Int(colorCount)))
-        colors = selectedColors
+        let count = Int(colorCount)
+        var generatedColors: [Color] = []
+        
+        // Generate evenly distributed hues across the color spectrum
+        for i in 0..<count {
+            let hue = Double(i) / Double(count)
+            let saturation = 0.6 + Double.random(in: 0...0.4)
+            let brightness = 0.6 + Double.random(in: 0...0.4)
+            generatedColors.append(Color(hue: hue, saturation: saturation, brightness: brightness))
+        }
+        
+        colors = generatedColors
+    }
+    
+    private func generateGradient() {
+        let count = Int(colorCount)
+        guard count > 0 else { return }
+        
+        // Generate two random colors
+        let startHue = Double.random(in: 0...1)
+        let startSaturation = Double.random(in: 0.6...1.0)
+        let startBrightness = Double.random(in: 0.6...1.0)
+        
+        let endHue = Double.random(in: 0...1)
+        let endSaturation = Double.random(in: 0.6...1.0)
+        let endBrightness = Double.random(in: 0.6...1.0)
+        
+        var generatedColors: [Color] = []
+        
+        // Interpolate between start and end colors
+        for i in 0..<count {
+            let t = count > 1 ? Double(i) / Double(count - 1) : 0.0
+            
+            // Interpolate each component
+            let hue = startHue + (endHue - startHue) * t
+            let saturation = startSaturation + (endSaturation - startSaturation) * t
+            let brightness = startBrightness + (endBrightness - startBrightness) * t
+            
+            generatedColors.append(Color(hue: hue, saturation: saturation, brightness: brightness))
+        }
+        
+        colors = generatedColors
     }
 }
 
@@ -541,7 +595,7 @@ public struct WavePreview: View {
                     NumericParameterControl(
                         title: "Color Count",
                         value: $colorCount,
-                        in: 2...8,
+                        in: 2...128,
                         step: 1
                     )
                 }
@@ -556,9 +610,18 @@ public struct WavePreview: View {
     }
     
     private func randomizeColors() {
-        let colorOptions: [Color] = [.red, .orange, .yellow, .green, .blue, .purple, .pink, .cyan, .mint, .indigo]
-        let selectedColors = Array(colorOptions.shuffled().prefix(Int(colorCount)))
-        colors = selectedColors
+        let count = Int(colorCount)
+        var generatedColors: [Color] = []
+        
+        // Generate evenly distributed hues across the color spectrum
+        for i in 0..<count {
+            let hue = Double(i) / Double(count)
+            let saturation = 0.6 + Double.random(in: 0...0.4)
+            let brightness = 0.6 + Double.random(in: 0...0.4)
+            generatedColors.append(Color(hue: hue, saturation: saturation, brightness: brightness))
+        }
+        
+        colors = generatedColors
     }
 }
 
@@ -577,7 +640,7 @@ public struct SpiralPreview: View {
     @State private var centerOffsetPx: CGSize = .zero
     @State private var colorCount: CGFloat = 4
     @State private var colors: [Color] = [.red, .orange, .yellow, .green]
-    
+
     public var body: some View {
         VStack(spacing: 0) {
             // Main preview
@@ -609,7 +672,7 @@ public struct SpiralPreview: View {
                     NumericParameterControl(
                         title: "Stripes Per Turn (count)",
                         value: $stripesPerTurn,
-                        in: 1...50,
+                        in: 1...30,
                         step: 1
                     )
                     
@@ -643,7 +706,7 @@ public struct SpiralPreview: View {
                     NumericParameterControl(
                         title: "Color Count (colors)",
                         value: $colorCount,
-                        in: 1...8,
+                        in: 1...128,
                         step: 1
                     )
                 }
@@ -658,8 +721,17 @@ public struct SpiralPreview: View {
     }
     
     private func randomizeColors() {
-        let colorOptions: [Color] = [.red, .orange, .yellow, .green, .blue, .purple, .pink, .cyan, .mint, .indigo]
-        let selectedColors = Array(colorOptions.shuffled().prefix(Int(colorCount)))
-        colors = selectedColors
+        let count = Int(colorCount)
+        var generatedColors: [Color] = []
+        
+        // Generate evenly distributed hues across the color spectrum
+        for i in 0..<count {
+            let hue = Double(i) / Double(count)
+            let saturation = 0.6 + Double.random(in: 0...0.4)
+            let brightness = 0.6 + Double.random(in: 0...0.4)
+            generatedColors.append(Color(hue: hue, saturation: saturation, brightness: brightness))
+        }
+        
+        colors = generatedColors
     }
 }

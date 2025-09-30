@@ -9,31 +9,17 @@
 #include <SwiftUI/SwiftUI_Metal.h>
 using namespace metal;
 
-// Simple palette with up to 8 colors (clean and efficient)
-inline half4 paletteAt(int i, int n,
-                       half4 c0, half4 c1, half4 c2, half4 c3,
-                       half4 c4, half4 c5, half4 c6, half4 c7) {
-    i = (n > 0) ? (i % n) : 0;
-    switch (i) {
-        case 0: return c0;  case 1: return c1;  case 2: return c2;  case 3: return c3;
-        case 4: return c4;  case 5: return c5;  case 6: return c6;  default: return c7;
-    }
-}
-
-inline float diff01(float a, float b) {
-    float d = a - b;           // any real
-    return d - round(d);       // fold to (-0.5, 0.5]
-}
-
 [[ stitchable ]]
-half4 spiralStripes(float2 position, SwiftUI::Layer layer,
+half4 spiralStripes(
+                    float2 position, SwiftUI::Layer layer,
                     float2 viewSize,
                     float stripesPerTurn,     // bands per 2π
                     float twist,              // strength of log(r) term
                     float2 centerOffsetPx,
-                    float paletteCount,       // 1…8
-                    half4 c0, half4 c1, half4 c2, half4 c3,
-                    half4 c4, half4 c5, half4 c6, half4 c7)
+                    float antialiasingLevel,  // 0.0 = off, 1.0 = light, 2.0 = medium, 3.0 = heavy
+                    device const half4* colors, // Color Array
+                    int colorCount
+                    )
 {
     float2 center = 0.5 * viewSize + centerOffsetPx;
     float2 p = position - center;
@@ -46,41 +32,59 @@ half4 spiralStripes(float2 position, SwiftUI::Layer layer,
     // One "unit" in phase == one stripe. pWrap ∈ [0,1) by construction, so no seam.
     float phase = stripesPerTurn * angleTurns + twist * log(r);
     float pWrap = fract(phase);                 // [0,1)
-    float distToEdge = min(pWrap, 1.0 - pWrap); // distance to nearest stripe boundary
-
-    // --- Simple AA using fixed pixel step ---
-    float aaPixels = 1.0; // Fixed AA width
-    float2 nrm = p / r;
-    float2 tng = float2(-nrm.y, nrm.x);
-    float2 dpR = nrm * aaPixels;
-    float2 dpT = tng * aaPixels;
-
-    float phaseR = stripesPerTurn *
-    (atan2(p.y + dpR.y, p.x + dpR.x) * (1.0f / (2.0f * M_PI_F)))
-    + twist * log(length(p + dpR));
-    float phaseT = stripesPerTurn *
-    (atan2(p.y + dpT.y, p.x + dpT.x) * (1.0f / (2.0f * M_PI_F)))
-    + twist * log(length(p + dpT));
-
-    // Wrap both neighbors too, then take minimal signed difference.
-    float dR = diff01(fract(phaseR), pWrap);
-    float dT = diff01(fract(phaseT), pWrap);
-    float bandsPerPx = length(float2(dR, dT));      // how fast pWrap changes per pixel
-    float aaBands = max(aaPixels, 0.0001) * max(bandsPerPx, 1e-5);
-
-    // Coverage: 0 at edge → 1 mid-stripe (smooth and seam-free)
-    float coverage = smoothstep(0.0, aaBands, distToEdge);
 
     // --- Palette (repeat cyclically) ---
-    int n = clamp(int(paletteCount), 1, 8);
-    int idx  = clamp(int(floor(pWrap * float(n))), 0, n - 1);
-    int idxN = (idx + 1) % n;
-
-    half4 base = paletteAt(idx, n, c0,c1,c2,c3,c4,c5,c6,c7);
-    half4 next = paletteAt(idxN, n, c0,c1,c2,c3,c4,c5,c6,c7);
-
-    // Slight cross-fade near the edge for crisp AA
-    half4 color = mix(next, base, half(coverage));
-    return color;
+    int n = max(colorCount, 1);
+    int idx = clamp(int(floor(pWrap * float(n))), 0, n - 1);
+    half4 base = colors[idx];
+    
+    if (antialiasingLevel > 0.0) {
+        // --- Weighted sampling with Gaussian-like falloff for subtle antialiasing ---
+        float aaWidth = antialiasingLevel;
+        
+        // Sample neighboring positions with multiple radii for better coverage
+        float2 nrm = p / r;
+        float2 tng = float2(-nrm.y, nrm.x);
+        
+        half4 weightedSum = half4(0.0);
+        float totalWeight = 0.0;
+        
+        // Sample in a circular pattern with multiple radii
+        for (int i = 0; i < 8; i++) {
+            float angle = float(i) * (M_PI_F / 4.0); // 8 samples around the circle
+            float2 direction = float2(cos(angle), sin(angle));
+            
+            // Sample at multiple distances for better coverage
+            for (int j = 1; j <= 3; j++) {
+                float distance = float(j) * aaWidth * 0.5; // 0.5, 1.0, 1.5 * aaWidth
+                float2 offset = direction * distance;
+                
+                // Calculate phase at this sample position
+                float phase = stripesPerTurn * (atan2(p.y + offset.y, p.x + offset.x) * (1.0f / (2.0f * M_PI_F))) + twist * log(length(p + offset));
+                float pWrap = fract(phase);
+                int idx = clamp(int(floor(pWrap * float(n))), 0, n - 1);
+                half4 sampleColor = colors[idx];
+                
+                // Calculate weight using Gaussian-like falloff
+                float weight = exp(-distance * distance / (aaWidth * aaWidth));
+                
+                weightedSum += sampleColor * half4(weight);
+                totalWeight += weight;
+            }
+        }
+        
+        // Add center pixel with high weight
+        float centerWeight = 2.0; // Higher weight for center
+        weightedSum += base * half4(centerWeight);
+        totalWeight += centerWeight;
+        
+        // Normalize by total weight for proper blending
+        half4 finalColor = weightedSum / half4(totalWeight);
+        
+        return finalColor;
+    } else {
+        // No antialiasing - sharp edges
+        return base;
+    }
 }
 

@@ -10,7 +10,7 @@ import SwiftUI
 /// A comprehensive demo showcasing all available shader effects
 @MainActor
 public struct ShadyGroundDemo: View {
-    @State private var selectedEffect: String = "Checkerboard"
+    @State private var selectedEffect: String = "Spiral"
     @State private var selectedCategory: String = "All"
     
     private let effects: [String: any ShaderEffect.Type] = [
@@ -92,8 +92,7 @@ private struct ShaderEffectPreviewContainer: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
-            .background(.regularMaterial)
-            
+
             // Create the appropriate preview based on effect type
             previewForEffect(effectType)
                 .frame(maxWidth: CGFloat.infinity, maxHeight: CGFloat.infinity)
@@ -129,5 +128,5 @@ private struct ShaderEffectPreviewContainer: View {
 
 #Preview("ShadyGround Gallery") {
     ShadyGroundDemo()
-        .frame(width: 600, height: 700, alignment: .topLeading)
+        .frame(width: 1000, height: 800, alignment: .topLeading)
 }
