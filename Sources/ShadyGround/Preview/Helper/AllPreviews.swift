@@ -672,6 +672,7 @@ public struct SpiralPreview: View {
     @State private var centerOffsetPx: CGSize = .zero
     @State private var colorCount: CGFloat = 4
     @State private var colors: [Color] = [.red, .orange, .yellow, .green]
+    @State private var antialiasingLevel: CGFloat = 0.0
 
     public var body: some View {
         VStack(spacing: 0) {
@@ -680,7 +681,8 @@ public struct SpiralPreview: View {
                 stripesPerTurn: stripesPerTurn,
                 twist: twist,
                 centerOffsetPx: centerOffsetPx,
-                colors: colors
+                colors: colors,
+                antialiasingLevel: antialiasingLevel
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .clipped()
@@ -740,6 +742,13 @@ public struct SpiralPreview: View {
                         value: $colorCount,
                         in: 1...128,
                         step: 1
+                    )
+                    
+                    NumericParameterControl(
+                        title: "Antialiasing Level",
+                        value: $antialiasingLevel,
+                        in: 0...8,
+                        step: 0.5
                     )
                 }
             }
