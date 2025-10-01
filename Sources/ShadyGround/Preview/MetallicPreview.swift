@@ -8,13 +8,6 @@
 import SwiftUI
 import simd
 
-// Metallic Preview
-extension MetallicBackground {
-    public static func previewView() -> some View {
-        MetallicPreview()
-    }
-}
-
 @MainActor
 public struct MetallicPreview: View {
     @State private var text: String = "GOLD"
