@@ -25,6 +25,8 @@ let package = Package(
             .process("Fills/Grid/GridShader.metal"),
             .process("Fills/Noise/NoiseShader.metal"),
             .process("Fills/Spiral/SpiralStripes.metal"),
+            .process("Fills/Metallic/MetallicShader.metal"),
+            .process("Fills/Metallic/Resources/Matcaps.xcassets"),
         ]
         ),
         .testTarget(
