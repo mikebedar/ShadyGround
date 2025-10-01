@@ -61,12 +61,17 @@ using namespace metal;
     float normalStrength = edgeStrength * 2.0;
     float3 N = normalize(float3(-dx * normalStrength, -dy * normalStrength, 1.0));
     
-    // Reflect view direction around the normal for more dramatic effect
+    // Transform normal to view space for matcap lookup
+    // This is more stable than using reflection - prevents flashing
     float3 V = normalize(viewDir);
-    float3 R = reflect(-V, N);
     
-    // Map reflected vector to matcap UV coordinates [0,1]
-    float2 uvM = clamp(R.xy * 0.5 + 0.5, 0.0, 1.0);
+    // Project normal onto view plane (removes depth component)
+    float3 viewNormal = N - V * dot(N, V);
+    viewNormal = normalize(viewNormal);
+    
+    // Map view-space normal to matcap UV coordinates
+    // Matcaps are designed to be sampled this way (hemisphere projection)
+    float2 uvM = viewNormal.xy * 0.5 + 0.5;
     
     // Sample the matcap texture
     constexpr sampler s(address::clamp_to_edge, filter::linear);
