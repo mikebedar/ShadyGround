@@ -24,37 +24,46 @@ using namespace metal;
     if (base.a <= 0.001h) return half4(0);
     
     // Non-linear scaling for edgeStrength - use square root for smoother control
-    // This gives finer control at low values, prevents explosion at high values
     float scaledStrength = sqrt(edgeStrength * 0.5);
     
-    // Clamp sample distance to prevent sampling too far away
-    float sampleDist = clamp(scaledStrength, 0.5, 3.0);
+    // Clamp sample distance - smaller values reduce edge jitter
+    float sampleDist = clamp(scaledStrength, 0.5, 2.0);
     
-    // Sobel filter for smoother, more accurate gradients
-    // Sample 3x3 grid around current pixel
-    float a00 = layer.sample(position + float2(-sampleDist, -sampleDist)).a;
-    float a01 = layer.sample(position + float2(-sampleDist,  0)).a;
-    float a02 = layer.sample(position + float2(-sampleDist,  sampleDist)).a;
+    // Multi-scale gradient sampling for smoother edges
+    // Sample at two different scales and blend
+    float scale1 = sampleDist;
+    float scale2 = sampleDist * 1.5;
     
-    float a10 = layer.sample(position + float2(0, -sampleDist)).a;
-    // a11 is the center (base.a)
-    float a12 = layer.sample(position + float2(0,  sampleDist)).a;
+    // Sobel at scale 1 (sharper)
+    float a00_1 = layer.sample(position + float2(-scale1, -scale1)).a;
+    float a01_1 = layer.sample(position + float2(-scale1,  0)).a;
+    float a02_1 = layer.sample(position + float2(-scale1,  scale1)).a;
+    float a10_1 = layer.sample(position + float2(0, -scale1)).a;
+    float a12_1 = layer.sample(position + float2(0,  scale1)).a;
+    float a20_1 = layer.sample(position + float2(scale1, -scale1)).a;
+    float a21_1 = layer.sample(position + float2(scale1,  0)).a;
+    float a22_1 = layer.sample(position + float2(scale1,  scale1)).a;
     
-    float a20 = layer.sample(position + float2(sampleDist, -sampleDist)).a;
-    float a21 = layer.sample(position + float2(sampleDist,  0)).a;
-    float a22 = layer.sample(position + float2(sampleDist,  sampleDist)).a;
+    // Sobel at scale 2 (smoother)
+    float a00_2 = layer.sample(position + float2(-scale2, -scale2)).a;
+    float a01_2 = layer.sample(position + float2(-scale2,  0)).a;
+    float a02_2 = layer.sample(position + float2(-scale2,  scale2)).a;
+    float a10_2 = layer.sample(position + float2(0, -scale2)).a;
+    float a12_2 = layer.sample(position + float2(0,  scale2)).a;
+    float a20_2 = layer.sample(position + float2(scale2, -scale2)).a;
+    float a21_2 = layer.sample(position + float2(scale2,  0)).a;
+    float a22_2 = layer.sample(position + float2(scale2,  scale2)).a;
     
-    // Sobel operator weights for X gradient
-    // [-1  0  1]
-    // [-2  0  2]
-    // [-1  0  1]
-    float dx = (-a00 + a20 - 2.0*a01 + 2.0*a21 - a02 + a22) / (4.0 * sampleDist);
+    // Calculate gradients at both scales
+    float dx1 = (-a00_1 + a20_1 - 2.0*a01_1 + 2.0*a21_1 - a02_1 + a22_1) / (4.0 * scale1);
+    float dy1 = (-a00_1 - 2.0*a10_1 - a20_1 + a02_1 + 2.0*a12_1 + a22_1) / (4.0 * scale1);
     
-    // Sobel operator weights for Y gradient
-    // [-1 -2 -1]
-    // [ 0  0  0]
-    // [ 1  2  1]
-    float dy = (-a00 - 2.0*a10 - a20 + a02 + 2.0*a12 + a22) / (4.0 * sampleDist);
+    float dx2 = (-a00_2 + a20_2 - 2.0*a01_2 + 2.0*a21_2 - a02_2 + a22_2) / (4.0 * scale2);
+    float dy2 = (-a00_2 - 2.0*a10_2 - a20_2 + a02_2 + 2.0*a12_2 + a22_2) / (4.0 * scale2);
+    
+    // Blend gradients - more weight on smoother scale for stability
+    float dx = mix(dx1, dx2, 0.6);
+    float dy = mix(dy1, dy2, 0.6);
     
     // Create surface normal from alpha gradients
     // Use the original edgeStrength for final normal scaling
@@ -73,50 +82,44 @@ using namespace metal;
     // Matcaps are designed to be sampled this way (hemisphere projection)
     float2 uvM = viewNormal.xy * 0.5 + 0.5;
     
-    // Sample the matcap texture
+    // Calculate curvature for adaptive smoothing
+    // High curvature = edges/corners that need smoothing
+    float curvature = length(float2(dx, dy));
+    curvature = smoothstep(0.0, 0.3, curvature);  // Remap to 0-1 range
+    
+    // Sample the matcap texture with curvature-based blur
     constexpr sampler s(address::clamp_to_edge, filter::linear);
-    half3 metallicColor = matcap.sample(s, uvM).rgb;
+    half3 matcapSharp = matcap.sample(s, uvM).rgb;
+    
+    // Create blurred version by sampling neighbors
+    // Use smaller offset for subtle smoothing
+    float blurRadius = 0.015;  // Small blur in UV space
+    half3 matcapBlur = (
+        matcap.sample(s, uvM + float2(blurRadius, 0.0)).rgb +
+        matcap.sample(s, uvM - float2(blurRadius, 0.0)).rgb +
+        matcap.sample(s, uvM + float2(0.0, blurRadius)).rgb +
+        matcap.sample(s, uvM - float2(0.0, blurRadius)).rgb +
+        matcap.sample(s, uvM + float2(blurRadius * 0.7, blurRadius * 0.7)).rgb +
+        matcap.sample(s, uvM - float2(blurRadius * 0.7, blurRadius * 0.7)).rgb +
+        matcap.sample(s, uvM + float2(blurRadius * 0.7, -blurRadius * 0.7)).rgb +
+        matcap.sample(s, uvM - float2(blurRadius * 0.7, -blurRadius * 0.7)).rgb
+    ) * 0.125;  // Average of 8 samples
+    
+    // Mix based on curvature: flat areas = sharp, curved areas = blurred
+    half3 metallicColor = mix(matcapSharp, matcapBlur, half(curvature * 0.7));
+    
+    // Fresnel effect - edges facing away from camera get brighter
+    // This creates the classic metallic rim lighting effect
+    float viewDot = abs(dot(viewNormal, V));
+    float fresnel = pow(1.0 - viewDot, 2.5);  // Power of 2.5 gives nice falloff
+
+    // Brighten edges based on Fresnel
+    // Use the brightest part of the matcap (center) for rim highlights
+    half3 rimColor = matcap.sample(s, float2(0.5, 0.5)).rgb;
+    metallicColor = mix(metallicColor, rimColor * 1.5h, half(fresnel * 0.4));
     
     // Mix with base color
     half3 outRGB = mix(base.rgb, metallicColor, half(mixAmount));
     
     return half4(outRGB, base.a);
-}
-
-// Debug shader to visualize normals as colors
-[[ stitchable ]] half4 metallicDebug(
-    float2 position,
-    SwiftUI::Layer layer,
-    float2 resolution,
-    float edgeStrength
-) {
-    half4 base = layer.sample(position);
-    if (base.a <= 0.001h) return half4(0);
-    
-    // Use same non-linear scaling as main shader
-    float scaledStrength = sqrt(edgeStrength * 0.5);
-    float sampleDist = clamp(scaledStrength, 0.5, 3.0);
-    
-    // Sobel filter
-    float a00 = layer.sample(position + float2(-sampleDist, -sampleDist)).a;
-    float a01 = layer.sample(position + float2(-sampleDist,  0)).a;
-    float a02 = layer.sample(position + float2(-sampleDist,  sampleDist)).a;
-    
-    float a10 = layer.sample(position + float2(0, -sampleDist)).a;
-    float a12 = layer.sample(position + float2(0,  sampleDist)).a;
-    
-    float a20 = layer.sample(position + float2(sampleDist, -sampleDist)).a;
-    float a21 = layer.sample(position + float2(sampleDist,  0)).a;
-    float a22 = layer.sample(position + float2(sampleDist,  sampleDist)).a;
-    
-    float dx = (-a00 + a20 - 2.0*a01 + 2.0*a21 - a02 + a22) / (4.0 * sampleDist);
-    float dy = (-a00 - 2.0*a10 - a20 + a02 + 2.0*a12 + a22) / (4.0 * sampleDist);
-    
-    float normalStrength = edgeStrength * 2.0;
-    float3 N = normalize(float3(-dx * normalStrength, -dy * normalStrength, 1.0));
-    
-    // Visualize normal as RGB (remap [-1,1] to [0,1])
-    half3 normalColor = half3(N.x * 0.5 + 0.5, N.y * 0.5 + 0.5, N.z);
-    
-    return half4(normalColor, base.a);
 }

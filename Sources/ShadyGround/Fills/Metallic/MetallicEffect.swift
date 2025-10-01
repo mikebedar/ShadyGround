@@ -67,7 +67,7 @@ public struct MetallicEffectModifier: ViewModifier {
             content
                 .layerEffect(
                     makeShader(for: geometry.size),
-                    maxSampleOffset: CGSize(width: 3, height: 3) // Sobel filter samples 3x3 grid
+                    maxSampleOffset: CGSize(width: 4, height: 4) // Multi-scale sampling up to 3px away
                 )
                 .onAppear {
                     if useMotion {
@@ -83,18 +83,16 @@ public struct MetallicEffectModifier: ViewModifier {
     private func startMotionUpdates() {
         #if os(iOS)
         let manager = CMMotionManager()
+        
+        // Check if device motion is available before starting
         guard manager.isDeviceMotionAvailable else {
-            print("⚠️ Motion not available on this device")
-            return
+            return  // Silently fail - motion not available
         }
         
-        print("✅ Starting motion updates for metallic effect")
         manager.deviceMotionUpdateInterval = 1.0 / 60.0
         manager.startDeviceMotionUpdates(to: .main) { [self] motion, error in
             guard let motion = motion else {
-                if let error = error {
-                    print("Motion error: \(error)")
-                }
+                // Silently ignore errors - CoreMotion permission warnings are normal
                 return
             }
             
