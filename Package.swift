@@ -17,6 +17,7 @@ let package = Package(
     targets: [
         .target(
             name: "ShadyGround",
+        exclude: ["Fills/Grass/GrassCore.h"],
         resources: [
             .process("Fills/Checkerboard/CheckerboardShader.metal"),
             .process("Fills/Stripe/StripeShader.metal"),
@@ -25,8 +26,10 @@ let package = Package(
             .process("Fills/Grid/GridShader.metal"),
             .process("Fills/Noise/NoiseShader.metal"),
             .process("Fills/Spiral/SpiralStripes.metal"),
-            .process("Fills/Metallic/MetallicShader.metal"),
+            .process("Fills/Metallic/MetallicMatcap.metal"),
             .process("Fills/Metallic/Resources/Matcaps.xcassets"),
+            .process("Fills/Grass/GrassShader.metal"),
+            .process("Fills/Grass/Instanced/GrassInstanced.metal"),
         ]
         ),
         .testTarget(

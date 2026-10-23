@@ -21,6 +21,7 @@ public struct ShadyGroundDemo: View {
             "Wave": WaveBackground.self,
             "Grid": GridBackground.self,
             "Noise": NoiseBackground.self,
+            "Grass": GrassView<Color>.self,
         ]
     
     public init() {}
@@ -117,6 +118,8 @@ private struct ShaderEffectPreviewContainer: View {
             NoisePreview()
         case is SpiralBackground.Type:
             SpiralPreview()
+        case is GrassView<Color>.Type:
+            GrassPreview()
         default:
             Text("Preview not available")
                 .foregroundColor(.secondary)

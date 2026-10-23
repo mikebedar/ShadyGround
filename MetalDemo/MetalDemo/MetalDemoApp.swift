@@ -6,12 +6,18 @@
 //
 
 import SwiftUI
+import ShadyGround
 
 @main
 struct MetalDemoApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TabView {
+                ContentView()
+                    .tabItem { Label("Metallic", systemImage: "sparkles") }
+                GrassPreview()
+                    .tabItem { Label("Grass", systemImage: "leaf") }
+            }
         }
     }
 }

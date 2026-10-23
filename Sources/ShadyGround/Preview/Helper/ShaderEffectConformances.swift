@@ -102,3 +102,17 @@ extension SpiralBackground {
         )
     }
 }
+
+extension GrassView: ShaderEffect {
+    public static var effectName: String { "Grass" }
+    public static var effectDescription: String { "Realistic turf driven by a lean, height and coverage control map, with mow patterns and dirt" }
+    public static var effectCategory: String { "Textures" }
+
+    public static var effectConfig: ShaderEffectConfig {
+        ShaderEffectConfig(
+            name: effectName,
+            description: effectDescription,
+            category: effectCategory
+        )
+    }
+}

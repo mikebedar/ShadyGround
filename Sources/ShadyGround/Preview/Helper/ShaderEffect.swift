@@ -53,7 +53,8 @@ public enum ShaderEffectRegistry {
             WaveBackground.effectConfig,
             GridBackground.effectConfig,
             NoiseBackground.effectConfig,
-            SpiralBackground.effectConfig
+            SpiralBackground.effectConfig,
+            GrassView<Color>.effectConfig
         ]
     }
     

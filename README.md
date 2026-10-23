@@ -164,6 +164,44 @@ NoiseBackground(
 )
 ```
 
+### Grass
+
+Realistic turf driven by a four-channel control map you draw with ordinary SwiftUI views, rendered straight down or through a perspective camera. Red and green encode blade lean (mow direction), blue is blade height, and alpha is coverage, so low coverage reveals textured dirt. Mow stripes, checkerboards, crosshatches (two passes at any angle, as on a major-league outfield) and rings are just lean patterns; wear a path with `.grassWear()`.
+
+```swift
+// Top-down lawn with a worn path
+GrassView(style: .lawn) {
+    ZStack {
+        GrassStripes(angle: .degrees(-90), stripeWidth: 44)
+        Capsule().frame(width: 60, height: 300).grassWear(0.7)
+    }
+}
+
+// A ballpark seen from the infield, in feet
+GrassView(
+    style: .nightGame,
+    camera: .framing(eye: [0, 4, 3.2], horizonAt: 0.42, fieldOfView: .degrees(62)),
+    ground: .feet(pointsPerFoot: 2, origin: UnitPoint(x: 0.5, y: 0.9)),
+    atmosphere: .haze(distance: 200)
+) {
+    BallparkControl()
+}
+```
+
+`GrassGround` says how the control map maps onto the ground (units, points per unit, where the origin sits) and is published to the map through the `grassGround` environment value so maps can draw in feet or metres. `GrassCamera` positions the eye in those units; `.framing(horizonAt:)` puts the horizon at a fraction of the view height, `.lookAt` aims at a point, and `.topDown` is the orthographic default. `GrassAtmosphere` adds fog, distance desaturation and a horizon glow. Pixels above the horizon are transparent so a backdrop can sit behind the view.
+
+`GrassTurfSimulation` is a spring-damper grid that writes lean and height into the map: `press` it with a footstep or `roll` a ball across it every frame, draw it with `GrassSimulationControl`, and the turf is combed flat along the path and slowly springs back. `GrassCamera.groundPoint(at:in:ground:)` converts a touch location to a ground point so taps can press the lawn.
+
+`GrassMetalView` draws the same turf entirely in Metal: the shared turf shader (`GrassCore.h`) runs as a full-screen ground pass and instanced blade geometry is drawn over the near field in the same render pass. Its map comes from a `GrassControlSource`: an image, a SwiftUI view rendered once, or a live `GrassTurfSimulation` uploaded straight to the control texture. A parity test confirms the ground pass matches `GrassView` pixel for pixel.
+
+`GrassHybridView` stacks real blade geometry over the fragment shader: `GrassInstancedView` (an `MTKView` drawing hundreds of thousands of instanced Bezier blades from the same control map) covers the first `bladeRange` ground units and fades into the shader's far field. It is the most realistic option for low cameras, at the cost of a second renderer and a GPU budget that needs a compute cull before it is phone-ready.
+
+Close to the camera, blades are drawn individually from a procedural height field; further away the turf is a band-limited anisotropic texture with a view-dependent stripe model. Presets: `.lawn`, `.ballpark`, `.stadium` (sunlit turf seen from the stands, tuned against upper-deck and drone photographs), `.nightGame`, `.golfGreen`, `.meadow`, `.dry`, `.artificial`. `GrassControl.heightMap(from:)` turns any image into a control map so a logo can be mown into the outfield. Set `windStrength` on a `GrassStyle` to animate a breeze. A pre-authored image works too: `GrassView(style: .lawn, controlMap: Image("field-control"))`.
+
+## Metal Surfaces
+
+Effects that need their own render passes build on `Core/MetalSurface.swift`: conform a renderer to `MetalSurfaceRenderer` (pipelines, formats, one `encode` per frame), host it with `MetalSurfaceView`, render it offscreen in tests with `MetalOffscreenTarget`, load functions through `ShadyGroundMetalLibrary`, and upload images with `MetalImageTexture`. `GrassMetalRenderer` is the first renderer built this way.
+
 ## Time-Based Animation
 Example of an animated use case with `AnimatedSpiralBackground`:
 
