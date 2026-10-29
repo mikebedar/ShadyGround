@@ -202,6 +202,18 @@ Close to the camera, blades are drawn individually from a procedural height fiel
 
 Effects that need their own render passes build on `Core/MetalSurface.swift`: conform a renderer to `MetalSurfaceRenderer` (pipelines, formats, one `encode` per frame), host it with `MetalSurfaceView`, render it offscreen in tests with `MetalOffscreenTarget`, load functions through `ShadyGroundMetalLibrary`, and upload images with `MetalImageTexture`. `GrassMetalRenderer` is the first renderer built this way.
 
+### Metal materials
+
+`MetalMaterialSurface` draws a metal with `MetalMaterialRenderer`: a height field per `MetalFinish` (`.polished`, `.brushed`, `.satin`, `.patina`) gives the normals, Cook-Torrance GGX the highlight from a point light above the surface, and a ceiling/floor gradient the reflection. Presets: `.brushedAluminum`, `.polishedSteel`, `.anodizedAluminum`, `.copperPatina`, `.titanium`, `.gold`, `.silver` (`MetalMaterial.presets`), or build your own `MetalMaterial(baseColor:roughness:metallic:finish:)`.
+
+```swift
+MetalMaterialSurface(.gold, lightDirection: [-0.3, 0.5, 0.8], isAnimating: !reduceMotion)
+    .frame(height: 200)
+    .clipShape(.rect(cornerRadius: 16))
+```
+
+It is decorative: hidden from accessibility, no hit testing. It draws once and redraws only when an input changes; `isAnimating` (ignored under Reduce Motion) sways the light at 30 fps. Drive `lightDirection` to follow a pointer or the device's tilt; the surface reads no sensors itself.
+
 ## Time-Based Animation
 Example of an animated use case with `AnimatedSpiralBackground`:
 

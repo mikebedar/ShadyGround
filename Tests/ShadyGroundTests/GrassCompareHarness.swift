@@ -1,4 +1,5 @@
-// Visual comparison harness. macOS only; writes PNGs to the session scratchpad.
+// Visual comparison harness. macOS only; writes PNGs under HarnessPaths.root (the temporary
+// directory unless SHADYGROUND_HARNESS_DIR says otherwise).
 // Not a correctness test: it never fails, it produces images for inspection.
 import Testing
 import SwiftUI
@@ -7,7 +8,7 @@ import Metal
 
 #if os(macOS)
 enum GrassCompare {
-    static let scratch = "/private/tmp/claude-501/-Users-bedar-Developer-ShadyGround/e7fdca46-9327-4811-b227-695ecf4ac9b0/scratchpad"
+    static var scratch: String { HarnessPaths.root }
 
     @MainActor
     static func render<V: View>(_ view: V, size: CGSize, scale: CGFloat = 2) -> CGImage? {
@@ -23,7 +24,7 @@ enum GrassCompare {
     }
 
     static func save(_ image: CGImage, _ name: String) {
-        let url = URL(fileURLWithPath: "\(scratch)/out/\(name).png")
+        let url = URL(fileURLWithPath: "\(HarnessPaths.directory("out"))/\(name).png")
         guard let dest = CGImageDestinationCreateWithURL(url as CFURL, "public.png" as CFString, 1, nil) else { return }
         CGImageDestinationAddImage(dest, image, nil)
         CGImageDestinationFinalize(dest)
@@ -534,8 +535,21 @@ extension GrassCompare {
                                bladeRange: 40, bladeCount: 300_000) {
         Image(decorative: art, scale: 2).resizable()
     }
+}
 
-    // A photograph as relief and direction, filling a 40 ft wide patch of lawn.
+/// A photograph as relief and direction, filling a 40 ft wide patch of lawn. Needs
+/// `ref/ball.jpg` under `SHADYGROUND_HARNESS_DIR`.
+@MainActor
+@Test(.enabled(if: HarnessPaths.hasReference("ball.jpg"), "needs ref/ball.jpg in SHADYGROUND_HARNESS_DIR"))
+func grassLawnRelief() throws {
+    var style = GrassStyle.stadium
+    style.bladeHeight = 5
+    style.stripeContrast = 0.45
+    let camera = GrassCamera.lookAt(eye: [0, -34, 16], target: [0, 4, 0], fieldOfView: .degrees(50))
+    let ground = GrassGround.feet(pointsPerFoot: 10, origin: .center)
+    let size = CGSize(width: 640, height: 480)
+    let away = CGVector(dx: 0, dy: 0.85)
+    let toward = CGVector(dx: 0, dy: -0.85)
     let photo = try #require(GrassCompare.load("ball.jpg"))
     let reliefMap = try #require(GrassControl.heightMap(from: photo, range: 0.2...0.9, lean: away, darkLean: toward, size: CGSize(width: 800, height: 800)))
     _ = try GrassCompare.metal("relief", reference: "ball.jpg", size: size, style: style, camera: camera, ground: ground,
@@ -554,7 +568,7 @@ extension GrassCompare {
 extension GrassCompare {
     /// Writes frames as a looping GIF.
     static func saveGIF(_ frames: [CGImage], name: String, fps: Double) {
-        let url = URL(fileURLWithPath: "\(scratch)/out/\(name).gif")
+        let url = URL(fileURLWithPath: "\(HarnessPaths.directory("out"))/\(name).gif")
         guard let dest = CGImageDestinationCreateWithURL(url as CFURL, "com.compuserve.gif" as CFString, frames.count, nil) else { return }
         let fileProps: [CFString: Any] = [kCGImagePropertyGIFDictionary: [kCGImagePropertyGIFLoopCount: 0]]
         CGImageDestinationSetProperties(dest, fileProps as CFDictionary)

@@ -1,5 +1,5 @@
 // Instanced-blade grass experiment: offscreen renders of the reference cameras,
-// side-by-side composites, and GPU timing. macOS only; writes PNGs to the scratchpad.
+// side-by-side composites, and GPU timing. macOS only; writes PNGs under HarnessPaths.root.
 import Testing
 import SwiftUI
 import Metal
@@ -7,8 +7,8 @@ import Metal
 
 #if os(macOS)
 enum GrassInstancedCompare {
-    static let scratch = "/private/tmp/claude-501/-Users-bedar-Developer-ShadyGround/e7fdca46-9327-4811-b227-695ecf4ac9b0/scratchpad"
-    static var outDir: String { "\(scratch)/instanced" }
+    static var scratch: String { HarnessPaths.root }
+    static var outDir: String { HarnessPaths.directory("instanced") }
 
     @MainActor
     static func renderControl<V: View>(_ view: V, ground: GrassGround, size: CGSize, scale: CGFloat) -> CGImage? {

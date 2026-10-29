@@ -116,3 +116,17 @@ extension GrassView: ShaderEffect {
         )
     }
 }
+
+extension MetalMaterialSurface: ShaderEffect {
+    public static var effectName: String { "Metal Materials" }
+    public static var effectDescription: String { "Brushed, polished, satin and patinated metals lit by a movable point light (Metal render pass)" }
+    public static var effectCategory: String { "Textures" }
+
+    public static var effectConfig: ShaderEffectConfig {
+        ShaderEffectConfig(
+            name: effectName,
+            description: effectDescription,
+            category: effectCategory
+        )
+    }
+}

@@ -54,7 +54,8 @@ public enum ShaderEffectRegistry {
             GridBackground.effectConfig,
             NoiseBackground.effectConfig,
             SpiralBackground.effectConfig,
-            GrassView<Color>.effectConfig
+            GrassView<Color>.effectConfig,
+            MetalMaterialSurface.effectConfig
         ]
     }
     

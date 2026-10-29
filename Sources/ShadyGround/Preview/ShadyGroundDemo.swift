@@ -22,6 +22,7 @@ public struct ShadyGroundDemo: View {
             "Grid": GridBackground.self,
             "Noise": NoiseBackground.self,
             "Grass": GrassView<Color>.self,
+            "Metal Materials": MetalMaterialSurface.self,
         ]
     
     public init() {}
@@ -120,6 +121,8 @@ private struct ShaderEffectPreviewContainer: View {
             SpiralPreview()
         case is GrassView<Color>.Type:
             GrassPreview()
+        case is MetalMaterialSurface.Type:
+            MetalMaterialPreview()
         default:
             Text("Preview not available")
                 .foregroundColor(.secondary)

@@ -30,6 +30,7 @@ let package = Package(
             .process("Fills/Metallic/Resources/Matcaps.xcassets"),
             .process("Fills/Grass/GrassShader.metal"),
             .process("Fills/Grass/Instanced/GrassInstanced.metal"),
+            .process("Fills/MetalMaterial/MetalMaterial.metal"),
         ]
         ),
         .testTarget(
